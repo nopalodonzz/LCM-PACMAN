@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#050817">
+<meta name="description" content="LCM Quest — permainan pembelajaran Matematik tentang faktor perdana dan gandaan sepunya terkecil.">
+<title>LCM Quest | Pac-Man Matematik</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="hero panel">
+  <div class="brand-mark" aria-hidden="true">◕</div>
+  <div class="hero-copy">
+    <p class="eyebrow">PERMAINAN PEMBELAJARAN MATEMATIK</p>
+    <h1>LCM <span>QUEST</span> <span class="ghosts" aria-hidden="true">👻 🩷 🩵 🟠</span></h1>
+    <p class="tagline">Kumpul Nombor <b>•</b> Bina Pokok Faktor <b>•</b> Selesaikan Misi</p>
+  </div>
+</header>
+
+<main>
+  <section class="top-grid">
+    <aside class="panel howto">
+      <h2>Cara Bermain</h2>
+      <ol>
+        <li><span>1</span><p>Kawal Pac-Man untuk mengumpul nombor mengikut arahan.</p></li>
+        <li><span>2</span><p>Cari nombor yang berkaitan dengan dua atau tiga nombor dalam misi.</p></li>
+        <li><span>3</span><p>Bina pokok faktor dan tentukan LCM.</p></li>
+        <li><span>4</span><p>Gunakan jawapan LCM untuk membuka pintu seterusnya.</p></li>
+      </ol>
+      <div class="hint">⭐ Setiap misi memberi petunjuk nombor seterusnya!</div>
+    </aside>
+
+    <section class="panel game-panel">
+      <div class="game-head"><div><small>SCORE</small><strong id="score">000000</strong></div><div class="level-tag">MISI <span id="level">1</span></div></div>
+      <div class="maze" id="maze" aria-label="Peta permainan">
+        <div class="maze-wall w1"></div><div class="maze-wall w2"></div><div class="maze-wall w3"></div>
+        <div class="maze-wall w4"></div><div class="maze-wall w5"></div><div class="maze-wall w6"></div>
+        <div class="maze-wall w7"></div><div class="maze-wall w8"></div>
+        <div class="dots" aria-hidden="true"></div>
+        <span class="number n1" data-number="12">12</span><span class="number n2" data-number="18">18</span>
+        <span class="number n3" data-number="6">6</span><span class="number n4" data-number="8">8</span>
+        <span class="number n5" data-number="4">4</span><span class="number n6" data-number="9">9</span>
+        <span class="fruit" aria-hidden="true">🍒</span>
+        <div id="pacman" class="pacman" role="img" aria-label="Pac-Man">◕</div>
+        <div class="ghost ghost-red" aria-hidden="true">👻</div><div class="ghost ghost-pink" aria-hidden="true">👻</div>
+      </div>
+      <div class="game-controls">
+        <p>Gerakkan Pac-Man menggunakan <b>W A S D</b> atau kekunci anak panah.</p>
+        <div class="dpad" aria-label="Kawalan Pac-Man">
+          <button data-move="up" aria-label="Atas">▲</button>
+          <div><button data-move="left" aria-label="Kiri">◀</button><button data-move="down" aria-label="Bawah">▼</button><button data-move="right" aria-label="Kanan">▶</button></div>
+        </div>
+      </div>
+    </section>
+
+    <aside class="side-stack">
+      <section class="panel factor-card">
+        <h2>Pokok Faktor</h2>
+        <div class="tree">
+          <div class="tree-node root">12</div><div class="tree-branches"><div class="tree-node blue">2</div><div class="tree-node pink">6</div></div>
+          <div class="tree-branches sub"><div></div><div class="tree-node green">2</div><div class="tree-node yellow">3</div></div>
+        </div>
+        <div class="formula">12 = 2<sup>2</sup> × 3</div>
+      </section>
+      <section class="panel next-numbers">
+        <h2>Nombor Seterusnya</h2>
+        <p>✓ &nbsp;18 <small>(untuk 2 dan 3)</small></p><p>✓ &nbsp;6 <small>(untuk 3 dan 6)</small></p>
+        <p>✓ &nbsp;4 <small>(untuk 4 dan 8)</small></p><p class="muted">• &nbsp;Kumpul semua nombor!</p>
+      </section>
+    </aside>
+  </section>
+
+  <section class="bottom-grid">
+    <section class="panel mission-panel">
+      <div class="section-heading"><h2>Misi Matematik</h2><span class="pill">LS 2.2.2 &amp; 2.2.3</span></div>
+      <div class="mission-content">
+        <div><span class="mission-number">MISI <b id="mission-num">1</b></span><h3 id="mission-title">Kumpul nombor 12 dan 18</h3>
+          <p id="mission-desc">Bina pokok faktor dan tentukan LCM bagi 12 dan 18.</p>
+          <div class="mission-target">Sasaran: <b id="target">LCM(12, 18) = ?</b></div>
+        </div>
+        <div class="answer-box">
+          <label for="answer">Jawapan LCM</label>
+          <div class="answer-row"><input id="answer" type="number" min="1" placeholder="Masukkan jawapan"><button id="check">Semak</button></div>
+          <p id="feedback" aria-live="polite">Petunjuk: gunakan faktor perdana tertinggi bagi setiap nombor.</p>
+        </div>
+      </div>
+      <div class="mission-footer"><button class="secondary" id="hint-btn">Tunjuk petunjuk</button><button id="next-mission" disabled>Misi seterusnya →</button></div>
+    </section>
+    <section class="panel application">
+      <h2>Contoh Misi Aplikasi</h2>
+      <div class="bus-scene" aria-hidden="true"><span>🌳</span><span>🚏</span><span>🚌</span><span>🚌</span></div>
+      <p>Bas A tiba setiap <b>12 minit</b>, manakala Bas B tiba setiap <b>18 minit</b>. Jika kedua-dua bas tiba bersama pada pukul 8.00 pagi, bilakah kedua-duanya tiba bersama semula?</p>
+      <div class="answer-callout">Jawapan: <b>36 minit</b><br><small>(pukul 8.36 pagi)</small></div>
+    </section>
+  </section>
+
+  <section class="panel flow-panel">
+    <h2>Aliran Aktiviti Pembelajaran</h2>
+    <div class="flow">
+      <div class="flow-step"><span>◕</span><div><b>1. Terokai Peta</b><small>Kumpul nombor melalui permainan Pac-Man.</small></div></div><i>➜</i>
+      <div class="flow-step purple"><span>⑂</span><div><b>2. Selesaikan Pokok Faktor</b><small>Kenal pasti pemfaktoran perdana dan tentukan LCM.</small></div></div><i>➜</i>
+      <div class="flow-step green"><span>▣</span><div><b>3. Aplikasi dalam Misi</b><small>Gunakan LCM untuk menyelesaikan masalah harian.</small></div></div><i>➜</i>
+      <div class="flow-step orange"><span>🏆</span><div><b>4. Buka Pintu Seterusnya</b><small>Teruskan misi hingga ke peringkat akhir.</small></div></div>
+    </div>
+  </section>
+</main>
+<footer>LCM QUEST <span>•</span> Belajar Matematik sambil bermain</footer>
+<script src="script.js"></script>
+</body>
+</html>
