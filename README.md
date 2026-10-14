@@ -6,7 +6,14 @@ Website pembelajaran responsif bertema Pac-Man untuk topik pemfaktoran perdana d
 
 - `index.html` — struktur kandungan laman.
 - `style.css` — reka bentuk neon, susun atur responsif dan gaya permainan.
-- `script.js` — kawalan Pac-Man, pengumpulan nombor, skor, semakan jawapan dan misi.
+- `script.js` — kawalan Pac-Man, pengumpulan nombor, inventori token, pokok faktor interaktif, skor, semakan jawapan dan misi.
+
+## Aliran Misi 1
+
+1. Contoh aplikasi masalah bas dipaparkan pada permulaan. Permainan bermula secara automatik selepas 6 saat atau apabila pemain menekan butang mula.
+2. Pemain menggerakkan Pac-Man dan mengumpul nombor dalam maze. Nombor yang dikumpul masuk ke inventori.
+3. Selepas nombor 12 dan 18 dikumpul, ruang pokok faktor dibuka. Pilih token daripada inventori, kemudian tekan ruang kosong yang betul. Token yang digunakan tidak boleh digunakan semula.
+4. Selepas kedua-dua pokok faktor lengkap, masukkan LCM 36 dan tekan Semak.
 - `.nojekyll` — memastikan GitHub Pages menerbitkan fail statik seperti biasa.
 
 ## Jalankan di komputer

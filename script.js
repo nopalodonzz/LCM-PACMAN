@@ -1,52 +1,30 @@
 const missions = [
-  {a:12,b:18,lcm:36,title:"Kumpul nombor 12 dan 18",desc:"Bina pokok faktor dan tentukan LCM bagi 12 dan 18.",hint:"12 = 2² × 3 dan 18 = 2 × 3². Ambil kuasa tertinggi setiap faktor: 2² × 3².",formula:"LCM(12, 18) = ?",factor:"12 = 2² × 3"},
-  {a:3,b:6,lcm:6,title:"Cari LCM bagi 3 dan 6",desc:"Gunakan faktor perdana untuk mencari gandaan sepunya terkecil.",hint:"3 = 3 dan 6 = 2 × 3. Ambil faktor 2 dan 3: 2 × 3.",formula:"LCM(3, 6) = ?",factor:"6 = 2 × 3"},
-  {a:4,b:8,lcm:8,title:"Buka pintu nombor 4 dan 8",desc:"Tentukan LCM bagi 4 dan 8 untuk membuka pintu seterusnya.",hint:"4 = 2² dan 8 = 2³. Kuasa tertinggi ialah 2³.",formula:"LCM(4, 8) = ?",factor:"8 = 2³"},
-  {a:6,b:9,lcm:18,title:"Misi terakhir: 6 dan 9",desc:"Selesaikan cabaran terakhir dan lengkapkan LCM Quest!",hint:"6 = 2 × 3 dan 9 = 3². Maka LCM = 2 × 3².",formula:"LCM(6, 9) = ?",factor:"9 = 3²"}
+ {a:12,b:18,lcm:36,title:"Kumpul nombor dan bina pokok faktor",desc:"Kumpul 12 dan 18 dalam maze. Gunakan token nombor yang dikumpul untuk melengkapkan kedua-dua pokok faktor.",hint:"12 = 2 × 6, kemudian 6 = 2 × 3. Untuk 18: 18 = 2 × 9, kemudian 9 = 3 × 3.",formula:"LCM(12, 18) = ?",factor:"12 = 2² × 3²; 18 = 2 × 3²"},
+ {a:3,b:6,lcm:6,title:"Cari LCM bagi 3 dan 6",desc:"Gunakan faktor perdana untuk mencari gandaan sepunya terkecil.",hint:"3 = 3 dan 6 = 2 × 3. Ambil faktor 2 dan 3: 2 × 3.",formula:"LCM(3, 6) = ?",factor:"6 = 2 × 3"},
+ {a:4,b:8,lcm:8,title:"Buka pintu nombor 4 dan 8",desc:"Tentukan LCM bagi 4 dan 8 untuk membuka pintu seterusnya.",hint:"4 = 2² dan 8 = 2³. Kuasa tertinggi ialah 2³.",formula:"LCM(4, 8) = ?",factor:"8 = 2³"},
+ {a:6,b:9,lcm:18,title:"Misi terakhir: 6 dan 9",desc:"Selesaikan cabaran terakhir dan lengkapkan LCM Quest!",hint:"6 = 2 × 3 dan 9 = 3². Maka LCM = 2 × 3².",formula:"LCM(6, 9) = ?",factor:"9 = 3²"}
 ];
-let current = 0, score = 0, collected = new Set();
-const $ = id => document.getElementById(id);
-const padScore = n => String(n).padStart(6,"0");
-function renderMission(){
- const m=missions[current];
- $("level").textContent=current+1; $("mission-num").textContent=current+1;
- $("mission-title").textContent=m.title; $("mission-desc").textContent=m.desc;
- $("target").textContent=m.formula; $("answer").value=""; $("feedback").textContent="Petunjuk: gunakan faktor perdana tertinggi bagi setiap nombor.";
- $("next-mission").disabled=true; $("next-mission").textContent=current===missions.length-1?"Lihat keputusan ✓":"Misi seterusnya →";
- document.querySelector(".formula").innerHTML=m.factor.replace("²","<sup>2</sup>").replace("³","<sup>3</sup>");
-}
-function checkAnswer(){
- const m=missions[current], value=Number($("answer").value);
- if(!value){$("feedback").textContent="Masukkan jawapan dahulu.";return}
- if(value===m.lcm){
-   $("feedback").textContent="Betul! Hebat, anda berjaya menyelesaikan misi ini. 🎉";
-   $("feedback").style.color="#4de4a1"; $("next-mission").disabled=false;
-   if(!collected.has("mission"+current)){score+=100;collected.add("mission"+current);$("score").textContent=padScore(score)}
- }else{$("feedback").textContent="Belum tepat. Cuba lagi atau tekan “Tunjuk petunjuk”."; $("feedback").style.color="#ff9aab"}
-}
-$("check").addEventListener("click",checkAnswer);
-$("answer").addEventListener("keydown",e=>{if(e.key==="Enter")checkAnswer()});
-$("hint-btn").addEventListener("click",()=>{$("feedback").textContent=missions[current].hint;$("feedback").style.color="#ffdf38"});
-$("next-mission").addEventListener("click",()=>{
- if(current<missions.length-1){current++;renderMission();return}
- $("mission-title").textContent="Tahniah, misi selesai!";$("mission-desc").textContent=`Anda telah mengumpul ${score} mata dan menyelesaikan semua misi LCM Quest.`;$("target").textContent="SEMUA MISI SELESAI";$("feedback").textContent="Muat semula halaman untuk bermain semula.";$("next-mission").disabled=true;
-});
-const pac=$("pacman"), maze=$("maze");let px=5,py=46;
-function move(dir){
- const step=5;
- if(dir==="left")px=Math.max(0,px-step);if(dir==="right")px=Math.min(92,px+step);
- if(dir==="up")py=Math.max(0,py-step);if(dir==="down")py=Math.min(84,py+step);
- pac.style.left=px+"%";pac.style.top=py+"%";
- document.querySelectorAll(".number:not(.collected)").forEach(n=>{
-  const x=n.offsetLeft+n.offsetWidth/2,y=n.offsetTop+n.offsetHeight/2;
-  const pX=pac.offsetLeft+pac.offsetWidth/2,pY=pac.offsetTop+pac.offsetHeight/2;
-  if(Math.hypot(x-pX,y-pY)<40){n.classList.add("collected");n.style.opacity=".2";score+=10;$("score").textContent=padScore(score)}
- });
-}
-document.addEventListener("keydown",e=>{
- const keys={ArrowLeft:"left",a:"left",A:"left",ArrowRight:"right",d:"right",D:"right",ArrowUp:"up",w:"up",W:"up",ArrowDown:"down",s:"down",S:"down"};
- if(keys[e.key]){e.preventDefault();move(keys[e.key])}
-});
-document.querySelectorAll("[data-move]").forEach(btn=>btn.addEventListener("click",()=>move(btn.dataset.move)));
-document.querySelectorAll(".number").forEach(n=>n.addEventListener("click",()=>{n.classList.add("collected");n.style.opacity=".2";score+=10;$("score").textContent=padScore(score)}));
-renderMission();
+let current=0,score=0,selectedToken=null,tokenId=0;
+const $=id=>document.getElementById(id), padScore=n=>String(n).padStart(6,"0");
+const inventory=[], slots={"12a":null,"12b":null,"6a":null,"6b":null,"18a":null,"18b":null,"9a":null,"9b":null};
+const expected={"12a":2,"12b":6,"6a":2,"6b":3,"18a":2,"18b":9,"9a":3,"9b":3};
+let introStarted=false,introTimer=null;
+function startGame(){if(introStarted)return;introStarted=true;clearInterval(introTimer);$('intro-timer').textContent="Jom bermain!";$('intro-overlay').classList.add('hidden');setTimeout(()=>$('intro-overlay').remove(),400);}
+$('start-game').addEventListener('click',startGame);
+let seconds=6;$('intro-timer').textContent=`Permainan bermula dalam ${seconds} saat…`;
+introTimer=setInterval(()=>{seconds--;if(seconds<=0){startGame()}else{$('intro-timer').textContent=`Permainan bermula dalam ${seconds} saat…`}},1000);
+function renderMission(){const m=missions[current];$('level').textContent=current+1;$('mission-num').textContent=current+1;$('mission-title').textContent=m.title;$('mission-desc').textContent=m.desc;$('target').textContent=m.formula;$('answer').value="";$('feedback').textContent="Lengkapkan pokok faktor dahulu sebelum menjawab LCM.";$('next-mission').disabled=true;$('next-mission').textContent=current===missions.length-1?"Lihat keputusan ✓":"Misi seterusnya →";}
+function updateScore(points){score+=points;$('score').textContent=padScore(score)}
+function addToken(value,source){const token={id:++tokenId,value:Number(value),source,used:false};inventory.push(token);updateScore(10);renderInventory();checkRoots();return token}
+function renderInventory(){const box=$('inventory');box.innerHTML='';const available=inventory.filter(t=>!t.used);if(!available.length){box.innerHTML='<span class="inventory-empty">Belum ada token tersedia.</span>';return}available.forEach(token=>{const b=document.createElement('button');b.className='inventory-token'+(selectedToken===token.id?' selected':'');b.textContent=token.value;b.title='Pilih nombor '+token.value+' untuk pokok faktor';b.addEventListener('click',()=>{selectedToken=token.id;renderInventory();$('tree-feedback').textContent=`Nombor ${token.value} dipilih. Sekarang tekan ruang “?” yang sepadan dalam pokok faktor.`});box.appendChild(b)})}
+function checkRoots(){const has12=inventory.some(t=>t.value===12),has18=inventory.some(t=>t.value===18);document.querySelectorAll('.factor-slot').forEach(s=>s.disabled=!(has12&&has18)||!!slots[s.dataset.slot]);if(has12&&has18){$('tree-instruction').textContent='Pilih token nombor yang dikumpul, kemudian tekan ruang “?” untuk membina pokok faktor 12 dan 18.'}else{$('tree-instruction').textContent='Kumpul nombor 12 dan 18 dahulu untuk membuka pokok faktor.'}}
+function updateTree(){document.querySelectorAll('.factor-slot').forEach(s=>{const value=slots[s.dataset.slot];s.textContent=value===null?'?':value;s.classList.toggle('filled',value!==null);s.disabled=!(inventory.some(t=>t.value===12)&&inventory.some(t=>t.value===18))||value!==null});const complete=Object.values(slots).every(v=>v!==null);if(complete){$('factor-formula').innerHTML='12 = 2<sup>2</sup> × 3 &nbsp; | &nbsp; 18 = 2 × 3<sup>2</sup>';$('tree-feedback').textContent='Hebat! Kedua-dua pokok faktor lengkap. Sekarang kira LCM.';$('tree-feedback').style.color='#4de4a1';$('check').disabled=false}else{$('factor-formula').textContent='12 = ? × ?  |  18 = ? × ?';}}
+document.querySelectorAll('.factor-slot').forEach(slot=>slot.addEventListener('click',()=>{if(selectedToken===null){$('tree-feedback').textContent='Pilih satu nombor daripada inventori dahulu.';return}const token=inventory.find(t=>t.id===selectedToken);if(!token||token.used)return;const key=slot.dataset.slot;if(token.value!==expected[key]){$('tree-feedback').textContent=`Nombor ${token.value} belum sesuai untuk ruang ini. Semak cabang faktor dan cuba lagi.`;$('tree-feedback').style.color='#ff9aab';return}slots[key]=token.value;token.used=true;selectedToken=null;$('tree-feedback').textContent=`Betul! ${token.value} diletakkan pada pokok faktor.`;$('tree-feedback').style.color='#4de4a1';renderInventory();updateTree();}));
+function checkAnswer(){const m=missions[current],value=Number($('answer').value);if(current===0&&!Object.values(slots).every(v=>v!==null)){$('feedback').textContent='Lengkapkan semua ruang pokok faktor dahulu!';$('feedback').style.color='#ff9aab';return}if(!value){$('feedback').textContent='Masukkan jawapan dahulu.';return}if(value===m.lcm){$('feedback').textContent='Betul! LCM ialah '+m.lcm+'. Hebat! 🎉';$('feedback').style.color='#4de4a1';$('next-mission').disabled=false;if(!$('next-mission').dataset.scored){updateScore(100);$('next-mission').dataset.scored='true'}}else{$('feedback').textContent='Belum tepat. Cuba lagi atau tekan “Tunjuk petunjuk”.';$('feedback').style.color='#ff9aab'}}
+$('check').addEventListener('click',checkAnswer);$('answer').addEventListener('keydown',e=>{if(e.key==='Enter')checkAnswer()});$('hint-btn').addEventListener('click',()=>{if(current===0){$('tree-feedback').textContent=missions[0].hint;$('tree-feedback').style.color='#ffdf38'}else{$('feedback').textContent=missions[current].hint;$('feedback').style.color='#ffdf38'}});
+$('next-mission').addEventListener('click',()=>{if(current<missions.length-1){current++;renderMission();$('next-mission').dataset.scored='';$('check').disabled=false;return}$('mission-title').textContent='Tahniah, misi selesai!';$('mission-desc').textContent=`Anda telah mengumpul ${score} mata dan menyelesaikan semua misi LCM Quest.`;$('target').textContent='SEMUA MISI SELESAI';$('feedback').textContent='Muat semula halaman untuk bermain semula.';$('next-mission').disabled=true});
+const pac=$('pacman');let px=5,py=46;
+function move(dir){if(!introStarted)return;const step=5;if(dir==='left')px=Math.max(0,px-step);if(dir==='right')px=Math.min(92,px+step);if(dir==='up')py=Math.max(0,py-step);if(dir==='down')py=Math.min(84,py+step);pac.style.left=px+'%';pac.style.top=py+'%';document.querySelectorAll('.number:not(.collected)').forEach(n=>{const x=n.offsetLeft+n.offsetWidth/2,y=n.offsetTop+n.offsetHeight/2,pX=pac.offsetLeft+pac.offsetWidth/2,pY=pac.offsetTop+pac.offsetHeight/2;if(Math.hypot(x-pX,y-pY)<38){n.classList.add('collected');n.style.opacity='.18';n.setAttribute('aria-label','Nombor '+n.dataset.number+' telah dikumpul');addToken(n.dataset.number,n)}})}
+document.addEventListener('keydown',e=>{const keys={ArrowLeft:'left',a:'left',A:'left',ArrowRight:'right',d:'right',D:'right',ArrowUp:'up',w:'up',W:'up',ArrowDown:'down',s:'down',S:'down'};if(keys[e.key]){e.preventDefault();move(keys[e.key])}});
+document.querySelectorAll('[data-move]').forEach(btn=>btn.addEventListener('click',()=>move(btn.dataset.move)));
+renderMission();updateTree();$('check').disabled=false;
