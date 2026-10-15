@@ -54,10 +54,5 @@ Jika anda mahu website muncul terus di `https://USERNAME.github.io/`, namakan re
 - GitHub Pages hanya menerbitkan fail statik. Jika kemudian anda perlukan akaun pengguna atau pangkalan data, itu memerlukan perkhidmatan tambahan.
 
 
-## Muzik latar dan kesan bunyi
-
-- Tekan **🔇 Bunyi: OFF** dalam panel permainan untuk menghidupkan atau mematikan muzik latar.
-- Muzik retro dijana menggunakan Web Audio API; tiada fail MP3 tambahan diperlukan.
-- Pac-Man memainkan bunyi apabila mengutip nombor.
-- Peletakan nombor yang betul pada pokok faktor memainkan bunyi berjaya; pilihan salah memainkan bunyi ralat.
-- Pelayar menyekat audio automatik sebelum interaksi pengguna, jadi pemain perlu menekan butang bunyi untuk menghidupkannya.
+### Penyelesaian masalah butang bunyi
+Pastikan `index.html` versi terkini mengandungi butang `id="sound-toggle"`. Jika butang tidak berfungsi selepas upload, gantikan ketiga-tiga fail `index.html`, `style.css`, dan `script.js`, kemudian buat hard refresh (`Ctrl+F5`). Tekan butang bunyi sekali untuk membenarkan pelayar memulakan audio.
