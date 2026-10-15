@@ -52,3 +52,12 @@ Jika anda mahu website muncul terus di `https://USERNAME.github.io/`, namakan re
 - Projek ini menggunakan Google Fonts jika internet tersedia; fon sistem akan digunakan sebagai gantian jika tidak.
 - Skor dan kemajuan tidak disimpan selepas halaman ditutup atau dimuat semula.
 - GitHub Pages hanya menerbitkan fail statik. Jika kemudian anda perlukan akaun pengguna atau pangkalan data, itu memerlukan perkhidmatan tambahan.
+
+
+## Muzik latar dan kesan bunyi
+
+- Tekan **🔇 Bunyi: OFF** dalam panel permainan untuk menghidupkan atau mematikan muzik latar.
+- Muzik retro dijana menggunakan Web Audio API; tiada fail MP3 tambahan diperlukan.
+- Pac-Man memainkan bunyi apabila mengutip nombor.
+- Peletakan nombor yang betul pada pokok faktor memainkan bunyi berjaya; pilihan salah memainkan bunyi ralat.
+- Pelayar menyekat audio automatik sebelum interaksi pengguna, jadi pemain perlu menekan butang bunyi untuk menghidupkannya.
