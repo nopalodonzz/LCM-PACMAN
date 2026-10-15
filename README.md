@@ -56,3 +56,10 @@ Jika anda mahu website muncul terus di `https://USERNAME.github.io/`, namakan re
 
 ### Penyelesaian masalah butang bunyi
 Pastikan `index.html` versi terkini mengandungi butang `id="sound-toggle"`. Jika butang tidak berfungsi selepas upload, gantikan ketiga-tiga fail `index.html`, `style.css`, dan `script.js`, kemudian buat hard refresh (`Ctrl+F5`). Tekan butang bunyi sekali untuk membenarkan pelayar memulakan audio.
+
+
+## Kemas kini telefon dan halangan maze
+- Kawalan arah dan butang bunyi melekat di bahagian bawah skrin telefon semasa halaman ditatal.
+- Audio diaktifkan selepas pemain mengetik butang bunyi; ini diperlukan oleh Safari/iOS dan kebanyakan pelayar mudah alih.
+- Kesan bunyi kutipan dan peletakan nombor lebih jelas dan dimainkan apabila audio dihidupkan.
+- Pac-Man tidak boleh menembusi dinding maze; dinding diperiksa sebelum setiap pergerakan.

@@ -13,13 +13,43 @@ let introStarted=false,introTimer=null;
 // Retro audio is synthesized with Web Audio API; no external audio files needed.
 let audioContext=null, masterGain=null, musicGain=null, musicTimer=null, musicEnabled=false, audioReady=false, musicStep=0;
 const melody=[523.25,659.25,783.99,659.25,587.33,698.46,880,698.46,523.25,659.25,783.99,1046.5,880,783.99,659.25,587.33];
-function initAudio(){if(audioContext){if(audioContext.state==='suspended')audioContext.resume().catch(()=>{});return true}const AC=window.AudioContext||window.webkitAudioContext;if(!AC){const btn=$('sound-toggle');if(btn){btn.textContent='Audio tidak disokong';btn.disabled=true}return false}audioContext=new AC();masterGain=audioContext.createGain();masterGain.gain.value=.7;masterGain.connect(audioContext.destination);musicGain=audioContext.createGain();musicGain.gain.value=0;musicGain.connect(masterGain);audioReady=true;return true}
-function tone(freq,duration=.12,wave='square',volume=.12,when=0,destination=masterGain){if(!audioContext||!destination)return;const start=audioContext.currentTime+when,osc=audioContext.createOscillator(),gain=audioContext.createGain();osc.type=wave;osc.frequency.setValueAtTime(freq,start);gain.gain.setValueAtTime(.0001,start);gain.gain.exponentialRampToValueAtTime(Math.max(.0002,volume),start+.012);gain.gain.exponentialRampToValueAtTime(.0001,start+duration);osc.connect(gain);gain.connect(destination);osc.start(start);osc.stop(start+duration+.025)}
-function startMusic(){if(!audioContext||!musicGain||musicTimer)return;musicTimer=setInterval(()=>{if(!musicEnabled||!audioContext)return;const note=melody[musicStep%melody.length];tone(note,.105,'square',.075,0,musicGain);if(musicStep%4===0)tone(note/2,.16,'triangle',.05,0,musicGain);musicStep++},190)}
-async function setSoundEnabled(enabled){if(!initAudio()||!audioReady)return;try{if(audioContext.state==='suspended')await audioContext.resume()}catch(error){console.warn('Audio belum dapat diaktifkan:',error)}musicEnabled=enabled;const btn=$('sound-toggle');if(!btn)return;btn.textContent=enabled?'🔊 Bunyi: ON':'🔇 Bunyi: OFF';btn.setAttribute('aria-pressed',String(enabled));if(enabled){startMusic();musicGain.gain.setTargetAtTime(.22,audioContext.currentTime,.08);tone(523.25,.08,'square',.08);tone(659.25,.1,'square',.08,.08);tone(783.99,.14,'square',.08,.16)}else if(musicGain)musicGain.gain.setTargetAtTime(0,audioContext.currentTime,.08)}
-function playCollectSound(value){if(!audioReady)return;const f=({2:660,3:784,4:880,6:988,8:1046,9:1175,12:1318,18:1480})[Number(value)]||880;tone(f,.09,'square',.13);tone(f*1.5,.075,'triangle',.07,.065)}
-function playPlaceSound(correct=true){if(!audioReady)return;if(correct){tone(659.25,.09,'square',.1);tone(783.99,.1,'square',.1,.08);tone(1046.5,.14,'triangle',.11,.16)}else{tone(220,.13,'sawtooth',.09);tone(185,.16,'sawtooth',.07,.11)}}
-function playAnswerSound(){if(!audioReady)return;tone(523.25,.1,'square',.1);tone(659.25,.1,'square',.1,.1);tone(783.99,.1,'square',.1,.2);tone(1046.5,.22,'triangle',.12,.3)}
+function initAudio(){
+ if(audioContext){if(audioContext.state==='suspended')audioContext.resume().catch(()=>{});return true}
+ const AC=window.AudioContext||window.webkitAudioContext;
+ if(!AC){const btn=$('sound-toggle');if(btn){btn.textContent='Audio tidak disokong';btn.disabled=true}return false}
+ try{
+  audioContext=new AC();masterGain=audioContext.createGain();masterGain.gain.value=.85;masterGain.connect(audioContext.destination);
+  musicGain=audioContext.createGain();musicGain.gain.value=0;musicGain.connect(masterGain);audioReady=true;return true;
+ }catch(error){console.warn('Tidak dapat menyediakan audio',error);return false}
+}
+function tone(freq,duration=.12,wave='square',volume=.12,when=0,destination=masterGain){
+ if(!audioContext||!destination)return;
+ const start=audioContext.currentTime+when,osc=audioContext.createOscillator(),gain=audioContext.createGain();
+ osc.type=wave;osc.frequency.setValueAtTime(freq,start);gain.gain.setValueAtTime(.0001,start);
+ gain.gain.exponentialRampToValueAtTime(Math.max(.0002,volume),start+.012);gain.gain.exponentialRampToValueAtTime(.0001,start+duration);
+ osc.connect(gain);gain.connect(destination);osc.start(start);osc.stop(start+duration+.025);
+}
+function startMusic(){
+ if(!audioContext||!musicGain||musicTimer)return;
+ musicTimer=setInterval(()=>{if(!musicEnabled||!audioContext||audioContext.state!=='running')return;
+  const note=melody[musicStep%melody.length];tone(note,.14,'square',.22,0,musicGain);
+  if(musicStep%4===0)tone(note/2,.19,'triangle',.13,0,musicGain);musicStep++;
+ },220);
+}
+async function setSoundEnabled(enabled){
+ const btn=$('sound-toggle');if(!btn)return;
+ if(!initAudio()||!audioReady){btn.textContent='Audio tidak disokong';return}
+ try{if(audioContext.state!=='running')await audioContext.resume();
+  // Play a short sound immediately inside the user's tap gesture to unlock iOS/Safari audio.
+  if(audioContext.state!=='running')throw new Error('Audio context is not running');
+  musicEnabled=enabled;btn.textContent=enabled?'🔊 Bunyi: ON':'🔇 Bunyi: OFF';btn.setAttribute('aria-pressed',String(enabled));
+  if(enabled){startMusic();musicGain.gain.cancelScheduledValues(audioContext.currentTime);musicGain.gain.setTargetAtTime(.7,audioContext.currentTime,.04);tone(660,.09,'square',.18);tone(880,.12,'square',.16,.09)}
+  else if(musicGain)musicGain.gain.setTargetAtTime(0,audioContext.currentTime,.04);
+ }catch(error){console.warn('Audio tidak dapat dimainkan:',error);musicEnabled=false;btn.textContent='Tekan untuk aktifkan bunyi';btn.setAttribute('aria-pressed','false')}
+}
+function playCollectSound(value){if(!audioReady||!musicEnabled||audioContext.state!=='running')return;const f=({2:660,3:784,4:880,6:988,8:1046,9:1175,12:1318,18:1480})[Number(value)]||880;tone(f,.11,'square',.22);tone(f*1.5,.09,'triangle',.15,.07)}
+function playPlaceSound(correct=true){if(!audioReady||!musicEnabled||audioContext.state!=='running')return;if(correct){tone(659.25,.1,'square',.2);tone(783.99,.11,'square',.2,.08);tone(1046.5,.16,'triangle',.2,.16)}else{tone(220,.14,'sawtooth',.16);tone(185,.17,'sawtooth',.13,.11)}}
+function playAnswerSound(){if(!audioReady||!musicEnabled||audioContext.state!=='running')return;tone(523.25,.11,'square',.2);tone(659.25,.11,'square',.2,.1);tone(783.99,.11,'square',.2,.2);tone(1046.5,.24,'triangle',.2,.3)}
 $('sound-toggle').addEventListener('click',()=>setSoundEnabled(!musicEnabled));
 document.addEventListener('pointerdown',()=>{if(!audioContext)initAudio()},{once:true});document.addEventListener('keydown',()=>{if(!audioContext)initAudio()},{once:true});
 function startGame(){if(introStarted)return;introStarted=true;clearInterval(introTimer);$('intro-timer').textContent="Jom bermain!";$('intro-overlay').classList.add('hidden');setTimeout(()=>$('intro-overlay').remove(),400);}
@@ -36,8 +66,24 @@ document.querySelectorAll('.factor-slot').forEach(slot=>slot.addEventListener('c
 function checkAnswer(){const m=missions[current],value=Number($('answer').value);if(current===0&&!Object.values(slots).every(v=>v!==null)){$('feedback').textContent='Lengkapkan semua ruang pokok faktor dahulu!';$('feedback').style.color='#ff9aab';return}if(!value){$('feedback').textContent='Masukkan jawapan dahulu.';return}if(value===m.lcm){$('feedback').textContent='Betul! LCM ialah '+m.lcm+'. Hebat! 🎉';$('feedback').style.color='#4de4a1';playAnswerSound();$('next-mission').disabled=false;if(!$('next-mission').dataset.scored){updateScore(100);$('next-mission').dataset.scored='true'}}else{$('feedback').textContent='Belum tepat. Cuba lagi atau tekan “Tunjuk petunjuk”.';$('feedback').style.color='#ff9aab';playPlaceSound(false)}}
 $('check').addEventListener('click',checkAnswer);$('answer').addEventListener('keydown',e=>{if(e.key==='Enter')checkAnswer()});$('hint-btn').addEventListener('click',()=>{if(current===0){$('tree-feedback').textContent=missions[0].hint;$('tree-feedback').style.color='#ffdf38'}else{$('feedback').textContent=missions[current].hint;$('feedback').style.color='#ffdf38'}});
 $('next-mission').addEventListener('click',()=>{if(current<missions.length-1){current++;renderMission();$('next-mission').dataset.scored='';$('check').disabled=false;return}$('mission-title').textContent='Tahniah, misi selesai!';$('mission-desc').textContent=`Anda telah mengumpul ${score} mata dan menyelesaikan semua misi LCM Quest.`;$('target').textContent='SEMUA MISI SELESAI';$('feedback').textContent='Muat semula halaman untuk bermain semula.';$('next-mission').disabled=true});
-const pac=$('pacman');let px=5,py=46;
-function move(dir){if(!introStarted)return;const step=5;if(dir==='left')px=Math.max(0,px-step);if(dir==='right')px=Math.min(92,px+step);if(dir==='up')py=Math.max(0,py-step);if(dir==='down')py=Math.min(84,py+step);pac.style.left=px+'%';pac.style.top=py+'%';document.querySelectorAll('.number:not(.collected)').forEach(n=>{const x=n.offsetLeft+n.offsetWidth/2,y=n.offsetTop+n.offsetHeight/2,pX=pac.offsetLeft+pac.offsetWidth/2,pY=pac.offsetTop+pac.offsetHeight/2;if(Math.hypot(x-pX,y-pY)<38){n.classList.add('collected');n.style.opacity='.18';n.setAttribute('aria-label','Nombor '+n.dataset.number+' telah dikumpul');addToken(n.dataset.number,n);playCollectSound(n.dataset.number)}})}
+const pac=$('pacman'),maze=$('maze');pac.style.left='2%';pac.style.top='2%';
+function overlaps(a,b){return a.left<b.right&&a.right>b.left&&a.top<b.bottom&&a.bottom>b.top}
+function canOccupy(left,top){
+ const margin=2,rect={left:left+margin,top:top+margin,right:left+pac.offsetWidth-margin,bottom:top+pac.offsetHeight-margin};
+ if(left<0||top<0||left+pac.offsetWidth>maze.clientWidth||top+pac.offsetHeight>maze.clientHeight)return false;
+ for(const wall of maze.querySelectorAll('.maze-wall')){const r={left:wall.offsetLeft,top:wall.offsetTop,right:wall.offsetLeft+wall.offsetWidth,bottom:wall.offsetTop+wall.offsetHeight};if(overlaps(rect,r))return false}
+ return true;
+}
+function move(dir){
+ if(!introStarted)return;
+ const step=Math.max(12,Math.min(20,maze.clientWidth*.035));let left=pac.offsetLeft,top=pac.offsetTop;
+ if(dir==='left')left-=step;if(dir==='right')left+=step;if(dir==='up')top-=step;if(dir==='down')top+=step;
+ if(canOccupy(left,top)){pac.style.left=left+'px';pac.style.top=top+'px'}else{pac.classList.remove('bump');void pac.offsetWidth;pac.classList.add('bump');setTimeout(()=>pac.classList.remove('bump'),130);return}
+ document.querySelectorAll('.number:not(.collected)').forEach(n=>{
+  const x=n.offsetLeft+n.offsetWidth/2,y=n.offsetTop+n.offsetHeight/2,pX=pac.offsetLeft+pac.offsetWidth/2,pY=pac.offsetTop+pac.offsetHeight/2;
+  if(Math.hypot(x-pX,y-pY)<Math.max(32,pac.offsetWidth*.85)){n.classList.add('collected');n.style.opacity='.18';n.setAttribute('aria-label','Nombor '+n.dataset.number+' telah dikumpul');addToken(n.dataset.number,n);playCollectSound(n.dataset.number)}
+ });
+}
 document.addEventListener('keydown',e=>{const keys={ArrowLeft:'left',a:'left',A:'left',ArrowRight:'right',d:'right',D:'right',ArrowUp:'up',w:'up',W:'up',ArrowDown:'down',s:'down',S:'down'};if(keys[e.key]){e.preventDefault();move(keys[e.key])}});
-document.querySelectorAll('[data-move]').forEach(btn=>btn.addEventListener('click',()=>move(btn.dataset.move)));
+document.querySelectorAll('[data-move]').forEach(btn=>{btn.addEventListener('pointerdown',e=>{e.preventDefault();move(btn.dataset.move)});btn.addEventListener('click',e=>{if(e.detail===0)move(btn.dataset.move)})});
 renderMission();updateTree();$('check').disabled=false;
