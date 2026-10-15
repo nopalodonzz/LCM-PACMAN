@@ -1,135 +1,1550 @@
 <!DOCTYPE html>
 <html lang="ms">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#050817">
-<meta name="description" content="LCM Quest — permainan pembelajaran Matematik tentang faktor perdana dan gandaan sepunya terkecil.">
-<title>LCM Quest | Pac-Man Matematik</title>
-<link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>LCM QUEST - Kembara Pokok Faktor & GSTK</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #080c18;
+      --card-bg: rgba(16, 24, 48, 0.95);
+      --border-blue: #00d2ff;
+      --pacman-yellow: #ffde59;
+      --accent-purple: #a855f7;
+      --emerald-green: #10b981;
+      --danger-red: #ef4444;
+      --font-retro: 'Press Start 2P', cursive;
+      --font-body: 'Fredoka', sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      background-image: 
+        radial-gradient(circle at 10% 20%, rgba(0, 210, 255, 0.08) 0%, transparent 40%),
+        radial-gradient(circle at 90% 80%, rgba(168, 85, 247, 0.08) 0%, transparent 40%);
+      color: #ffffff;
+      font-family: var(--font-body);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 10px;
+      overflow-x: hidden;
+    }
+
+    /* HEADER */
+    header {
+      width: 100%;
+      max-width: 1200px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--card-bg);
+      border: 3px solid var(--border-blue);
+      border-radius: 16px;
+      padding: 12px 24px;
+      margin-bottom: 12px;
+      box-shadow: 0 0 20px rgba(0, 210, 255, 0.25);
+      gap: 12px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .pac-logo {
+      width: 44px;
+      height: 44px;
+      background: var(--pacman-yellow);
+      border-radius: 50%;
+      clip-path: polygon(100% 0%, 50% 50%, 100% 100%, 0% 100%, 0% 0%);
+      animation: chomp 0.4s infinite alternate ease-in-out;
+      box-shadow: 0 0 14px var(--pacman-yellow);
+    }
+
+    @keyframes chomp {
+      0% { clip-path: polygon(100% 0%, 50% 50%, 100% 100%, 0% 100%, 0% 0%); }
+      100% { clip-path: polygon(100% 35%, 50% 50%, 100% 65%, 0% 100%, 0% 0%); }
+    }
+
+    .brand-title {
+      font-family: var(--font-retro);
+      font-size: 20px;
+      color: var(--pacman-yellow);
+      letter-spacing: 1px;
+      text-shadow: 2px 2px 0px #000;
+    }
+
+    .brand-sub {
+      font-size: 13px;
+      color: #94a3b8;
+      font-weight: 600;
+    }
+
+    .status-bar {
+      display: flex;
+      gap: 20px;
+      align-items: center;
+      font-family: var(--font-retro);
+      font-size: 13px;
+    }
+
+    .status-item {
+      background: rgba(0, 0, 0, 0.5);
+      padding: 8px 14px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .level-badge {
+      background: #7c3aed;
+      color: #fff;
+      padding: 3px 8px;
+      border-radius: 6px;
+    }
+
+    /* MAIN CONTAINER */
+    .game-container {
+      width: 100%;
+      max-width: 1200px;
+      display: grid;
+      grid-template-columns: minmax(320px, 460px) 1fr;
+      gap: 16px;
+      align-items: start;
+    }
+
+    @media (max-width: 992px) {
+      .game-container {
+        grid-template-columns: 1fr;
+        justify-items: center;
+      }
+    }
+
+    /* MAZE CANVAS */
+    .maze-card {
+      background: var(--card-bg);
+      border: 3px solid var(--border-blue);
+      border-radius: 16px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      box-shadow: 0 0 20px rgba(0, 210, 255, 0.2);
+      width: 100%;
+      max-width: 460px;
+      position: relative;
+    }
+
+    .canvas-wrapper {
+      position: relative;
+      background: #000;
+      border-radius: 10px;
+      overflow: hidden;
+      border: 3px solid #1e3a8a;
+      box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.9);
+      touch-action: none;
+    }
+
+    canvas {
+      display: block;
+      background: #000;
+    }
+
+    .freeze-banner {
+      position: absolute;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(14, 165, 233, 0.95);
+      border: 2px solid #fff;
+      color: #fff;
+      font-family: var(--font-retro);
+      font-size: 11px;
+      padding: 6px 14px;
+      border-radius: 20px;
+      pointer-events: none;
+      display: none;
+      animation: pulse 1.2s infinite;
+      box-shadow: 0 0 15px rgba(56, 189, 248, 0.7);
+      z-index: 5;
+      white-space: nowrap;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 0.9; transform: translateX(-50%) scale(1); }
+      50% { opacity: 1; transform: translateX(-50%) scale(1.05); }
+    }
+
+    .dpad-container {
+      display: none;
+      margin-top: 12px;
+      grid-template-columns: repeat(3, 48px);
+      grid-template-rows: repeat(3, 48px);
+      gap: 6px;
+    }
+
+    @media (max-width: 768px) {
+      .dpad-container {
+        display: grid;
+      }
+    }
+
+    .dbtn {
+      background: #1e293b;
+      border: 2px solid var(--border-blue);
+      color: #fff;
+      font-size: 18px;
+      font-weight: bold;
+      border-radius: 10px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.1s;
+    }
+    .dbtn:active {
+      background: var(--border-blue);
+      color: #000;
+    }
+    .dbtn-up { grid-column: 2; grid-row: 1; }
+    .dbtn-left { grid-column: 1; grid-row: 2; }
+    .dbtn-down { grid-column: 2; grid-row: 2; }
+    .dbtn-right { grid-column: 3; grid-row: 2; }
+
+    /* LEARNING PANEL */
+    .learning-panel {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .panel-card {
+      background: var(--card-bg);
+      border: 3px solid rgba(0, 210, 255, 0.4);
+      border-radius: 16px;
+      padding: 16px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+    }
+
+    .panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 2px dashed rgba(255, 255, 255, 0.15);
+      padding-bottom: 8px;
+      margin-bottom: 12px;
+    }
+
+    .panel-title {
+      font-family: var(--font-retro);
+      font-size: 13px;
+      color: var(--pacman-yellow);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .briefing-btn {
+      background: #0284c7;
+      border: none;
+      color: #fff;
+      padding: 6px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-family: var(--font-body);
+      font-weight: 700;
+      font-size: 12px;
+      transition: 0.2s;
+    }
+    .briefing-btn:hover {
+      background: #38bdf8;
+    }
+
+    .story-desc {
+      background: rgba(15, 23, 42, 0.85);
+      border-left: 4px solid var(--pacman-yellow);
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 14px;
+      line-height: 1.5;
+      color: #e2e8f0;
+      margin-bottom: 10px;
+    }
+
+    .task-badge {
+      display: inline-block;
+      background: rgba(16, 185, 129, 0.2);
+      border: 1px solid var(--emerald-green);
+      color: #6ee7b7;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    /* FACTOR TREES GRID */
+    .trees-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 14px;
+    }
+
+    .tree-box {
+      background: #0f172a;
+      border: 2px solid #334155;
+      border-radius: 12px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      transition: border-color 0.3s;
+    }
+    .tree-box.completed {
+      border-color: var(--emerald-green);
+      box-shadow: 0 0 10px rgba(16, 185, 129, 0.3);
+    }
+
+    .tree-title {
+      font-family: var(--font-retro);
+      font-size: 12px;
+      color: #38bdf8;
+      margin-bottom: 8px;
+    }
+
+    .tree-svg-container {
+      width: 100%;
+      height: 160px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .tree-index-equation {
+      margin-top: 8px;
+      background: rgba(0, 0, 0, 0.4);
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-family: monospace;
+      font-size: 13px;
+      color: #fcd34d;
+      font-weight: bold;
+    }
+
+    /* LCM QUIZ WORKSPACE */
+    .lcm-quiz-container {
+      background: #0b1120;
+      border: 2px solid var(--accent-purple);
+      border-radius: 12px;
+      padding: 14px;
+    }
+
+    .quiz-step {
+      margin-bottom: 14px;
+    }
+
+    .step-label {
+      font-size: 13px;
+      color: #cbd5e1;
+      font-weight: 700;
+      margin-bottom: 6px;
+      display: block;
+    }
+
+    .radio-choices {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 6px;
+    }
+
+    .choice-option {
+      background: #1e293b;
+      padding: 8px 12px;
+      border-radius: 8px;
+      border: 1px solid #475569;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 13px;
+      font-family: monospace;
+      transition: all 0.2s;
+    }
+    .choice-option:hover {
+      background: #334155;
+      border-color: var(--pacman-yellow);
+    }
+    .choice-option input[type="radio"] {
+      cursor: pointer;
+      accent-color: var(--pacman-yellow);
+    }
+
+    .input-row {
+      display: flex;
+      gap: 10px;
+      margin-top: 8px;
+      flex-wrap: wrap;
+    }
+
+    .lcm-input {
+      background: #1e293b;
+      border: 2px solid #475569;
+      border-radius: 8px;
+      color: #fff;
+      font-family: var(--font-retro);
+      font-size: 14px;
+      padding: 8px 14px;
+      width: 140px;
+      text-align: center;
+      outline: none;
+    }
+    .lcm-input:focus {
+      border-color: var(--pacman-yellow);
+      box-shadow: 0 0 10px rgba(255, 222, 89, 0.4);
+    }
+
+    .submit-btn {
+      background: var(--emerald-green);
+      border: none;
+      color: #000;
+      font-family: var(--font-retro);
+      font-size: 11px;
+      padding: 10px 18px;
+      border-radius: 8px;
+      cursor: pointer;
+      box-shadow: 0 0 10px rgba(16, 185, 129, 0.4);
+      transition: 0.2s;
+    }
+    .submit-btn:hover {
+      background: #34d399;
+      transform: translateY(-2px);
+    }
+
+    .quiz-feedback {
+      margin-top: 10px;
+      font-size: 13px;
+      font-weight: 700;
+      padding: 8px 12px;
+      border-radius: 6px;
+      display: none;
+    }
+    .feedback-error {
+      background: rgba(239, 68, 68, 0.2);
+      border: 1px solid var(--danger-red);
+      color: #fca5a5;
+    }
+    .feedback-success {
+      background: rgba(16, 185, 129, 0.2);
+      border: 1px solid var(--emerald-green);
+      color: #6ee7b7;
+    }
+
+    /* MODALS */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(5px);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      padding: 20px;
+    }
+
+    .modal-box {
+      background: #0f172a;
+      border: 3px solid var(--border-blue);
+      border-radius: 20px;
+      max-width: 580px;
+      width: 100%;
+      padding: 26px;
+      text-align: center;
+      box-shadow: 0 0 30px rgba(0, 210, 255, 0.4);
+      animation: modalPop 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+    }
+
+    @keyframes modalPop {
+      0% { transform: scale(0.8); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    .modal-title {
+      font-family: var(--font-retro);
+      font-size: 18px;
+      color: var(--pacman-yellow);
+      margin-bottom: 14px;
+      line-height: 1.4;
+    }
+
+    .timer-ring {
+      font-family: var(--font-retro);
+      font-size: 24px;
+      color: #38bdf8;
+      margin: 14px 0;
+    }
+
+    .modal-btn {
+      background: var(--pacman-yellow);
+      border: none;
+      color: #000;
+      font-family: var(--font-retro);
+      font-size: 12px;
+      padding: 12px 24px;
+      border-radius: 10px;
+      cursor: pointer;
+      margin-top: 14px;
+      box-shadow: 0 0 15px rgba(255, 222, 89, 0.5);
+      transition: transform 0.2s;
+    }
+    .modal-btn:hover {
+      transform: scale(1.05);
+    }
+
+    /* TOAST ALERT */
+    .toast-alert {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--danger-red);
+      color: #fff;
+      font-family: var(--font-retro);
+      font-size: 12px;
+      padding: 10px 20px;
+      border-radius: 30px;
+      box-shadow: 0 0 20px rgba(239, 68, 68, 0.7);
+      display: none;
+      z-index: 1100;
+      pointer-events: none;
+      white-space: nowrap;
+    }
+  </style>
 </head>
 <body>
-<div class="intro-overlay" id="intro-overlay" role="dialog" aria-modal="true" aria-labelledby="intro-title">
-  <div class="intro-card panel">
-    <div class="intro-icon">🚌</div><p class="eyebrow">CABARAN KEHIDUPAN SEBENAR</p>
-    <h2 id="intro-title">Misi 1: Bas yang tiba bersama</h2>
-    <p>Bas A tiba setiap <b>12 minit</b> dan Bas B setiap <b>18 minit</b>. Kedua-duanya tiba bersama pada pukul 8.00 pagi.</p>
-    <p class="intro-question">Bilakah kedua-dua bas akan tiba bersama semula?</p>
-    <div class="intro-answer">Petunjuk: cari <b>LCM bagi 12 dan 18</b>.</div>
-    <p class="intro-timer" id="intro-timer">Permainan bermula dalam 6 saat…</p>
-    <button id="start-game">Mula bermain sekarang →</button>
-  </div>
-</div>
-<header class="hero panel">
-  <div class="brand-mark" aria-hidden="true">◕</div>
-  <div class="hero-copy">
-    <p class="eyebrow">PERMAINAN PEMBELAJARAN MATEMATIK</p>
-    <h1>LCM <span>QUEST</span> <span class="ghosts" aria-hidden="true">👻 🩷 🩵 🟠</span></h1>
-    <p class="tagline">Kumpul Nombor <b>•</b> Bina Pokok Faktor <b>•</b> Selesaikan Misi</p>
-  </div>
-</header>
 
-<main>
-  <section class="top-grid">
-    <aside class="panel howto">
-      <h2>Cara Bermain</h2>
-      <ol>
-        <li><span>1</span><p>Kawal Pac-Man untuk mengumpul nombor mengikut arahan.</p></li>
-        <li><span>2</span><p>Cari nombor yang berkaitan dengan dua atau tiga nombor dalam misi.</p></li>
-        <li><span>3</span><p>Bina pokok faktor dan tentukan LCM.</p></li>
-        <li><span>4</span><p>Gunakan jawapan LCM untuk membuka pintu seterusnya.</p></li>
-      </ol>
-      <div class="hint">⭐ Setiap misi memberi petunjuk nombor seterusnya!</div>
-    </aside>
-
-    <section class="panel game-panel">
-      <div class="game-head"><div><small>SCORE</small><strong id="score">000000</strong></div><div class="level-tag">MISI <span id="level">1</span></div></div>
-      <div class="maze" id="maze" aria-label="Peta permainan">
-        <div class="maze-wall w1"></div><div class="maze-wall w2"></div><div class="maze-wall w3"></div>
-        <div class="maze-wall w4"></div><div class="maze-wall w5"></div><div class="maze-wall w6"></div>
-        <div class="maze-wall w7"></div><div class="maze-wall w8"></div>
-        <div class="dots" aria-hidden="true"></div>
-        <span class="number n1" data-number="12" style="left:12%;top:12%">12</span>
-        <span class="number n2" data-number="18" style="left:82%;top:35%">18</span>
-        <span class="number n3" data-number="2" style="left:34%;top:32%">2</span>
-        <span class="number n4" data-number="6" style="left:68%;top:43%">6</span>
-        <span class="number n5" data-number="2" style="left:17%;top:61%">2</span>
-        <span class="number n6" data-number="3" style="left:45%;top:76%">3</span>
-        <span class="number n7" data-number="9" style="left:80%;top:66%">9</span>
-        <span class="number n8" data-number="3" style="left:64%;top:24%">3</span>
-        <span class="number n9" data-number="2" style="left:25%;top:42%">2</span>
-        <span class="number n10" data-number="3" style="left:8%;top:38%">3</span>
-        <span class="fruit" aria-hidden="true">🍒</span>
-        <div id="pacman" class="pacman" role="img" aria-label="Pac-Man">◕</div>
-        <div class="ghost ghost-red" aria-hidden="true">👻</div><div class="ghost ghost-pink" aria-hidden="true">👻</div>
+  <!-- HEADER -->
+  <header>
+    <div class="brand">
+      <div class="pac-logo"></div>
+      <div>
+        <h1 class="brand-title">LCM QUEST</h1>
+        <p class="brand-sub">Kumpul Faktor Perdana • Lengkapkan Pokok • Selesaikan Masalah GSTK</p>
       </div>
-      <div class="game-controls">
-        <div class="game-help">
-          <p>Gerakkan Pac-Man menggunakan <b>W A S D</b> atau kekunci anak panah.</p>
-          <button id="sound-toggle" class="sound-toggle" type="button" aria-pressed="false" title="Hidupkan atau matikan muzik latar">🔇 Bunyi: OFF</button>
-        </div>
-        <div class="dpad" aria-label="Kawalan Pac-Man">
-          <button data-move="up" aria-label="Atas">▲</button>
-          <div><button data-move="left" aria-label="Kiri">◀</button><button data-move="down" aria-label="Bawah">▼</button><button data-move="right" aria-label="Kanan">▶</button></div>
-        </div>
-      </div>
-    </section>
-
-    <aside class="side-stack">
-      <section class="panel factor-card" id="factor-card">
-        <h2>Lengkapkan Pokok Faktor</h2>
-        <p class="tree-instruction" id="tree-instruction">Kumpul nombor 12 dan 18 dahulu untuk membuka pokok faktor.</p>
-        <div class="factor-trees">
-          <div class="factor-mini-tree"><strong>12</strong><div class="factor-slots"><button class="factor-slot" data-slot="12a" data-answer="2" disabled>?</button><button class="factor-slot" data-slot="12b" data-answer="6" disabled>?</button></div><div class="factor-slots leaves"><span></span><button class="factor-slot" data-slot="6a" data-answer="2" disabled>?</button><button class="factor-slot" data-slot="6b" data-answer="3" disabled>?</button></div></div>
-          <div class="factor-mini-tree"><strong>18</strong><div class="factor-slots"><button class="factor-slot" data-slot="18a" data-answer="2" disabled>?</button><button class="factor-slot" data-slot="18b" data-answer="9" disabled>?</button></div><div class="factor-slots leaves"><span></span><button class="factor-slot" data-slot="9a" data-answer="3" disabled>?</button><button class="factor-slot" data-slot="9b" data-answer="3" disabled>?</button></div></div>
-        </div>
-        <div class="inventory-title">Nombor yang Pac-Man telah kumpul</div><div id="inventory" class="inventory"><span class="inventory-empty">Belum ada nombor dikumpul.</span></div>
-        <p class="tree-feedback" id="tree-feedback" aria-live="polite">Gerakkan Pac-Man dan sentuh nombor dalam maze. Pilih token yang dikumpul, kemudian pilih ruang kosong.</p>
-        <div class="formula" id="factor-formula">12 = ? &nbsp; | &nbsp; 18 = ?</div>
-      </section>
-      <section class="panel next-numbers">
-        <h2>Nombor Seterusnya</h2>
-        <p>✓ &nbsp;18 <small>(untuk 2 dan 3)</small></p><p>✓ &nbsp;6 <small>(untuk 3 dan 6)</small></p>
-        <p>✓ &nbsp;4 <small>(untuk 4 dan 8)</small></p><p class="muted">• &nbsp;Kumpul semua nombor!</p>
-      </section>
-    </aside>
-  </section>
-
-  <section class="bottom-grid">
-    <section class="panel mission-panel">
-      <div class="section-heading"><h2>Misi Matematik</h2><span class="pill">LS 2.2.2 &amp; 2.2.3</span></div>
-      <div class="mission-content">
-        <div><span class="mission-number">MISI <b id="mission-num">1</b></span><h3 id="mission-title">Kumpul nombor dan bina pokok faktor</h3>
-          <p id="mission-desc">Kumpul 12 dan 18 dalam maze. Gunakan token nombor yang dikumpul untuk melengkapkan kedua-dua pokok faktor.</p>
-          <div class="mission-target">Sasaran akhir: <b id="target">LCM(12, 18) = ?</b></div>
-        </div>
-        <div class="answer-box">
-          <label for="answer">Jawapan LCM (selepas pokok lengkap)</label>
-          <div class="answer-row"><input id="answer" type="number" min="1" placeholder="Masukkan jawapan"><button id="check">Semak</button></div>
-          <p id="feedback" aria-live="polite">Petunjuk: gunakan faktor perdana tertinggi bagi setiap nombor.</p>
-        </div>
-      </div>
-      <div class="mission-footer"><button class="secondary" id="hint-btn">Tunjuk petunjuk</button><button id="next-mission" disabled>Misi seterusnya →</button></div>
-    </section>
-    <section class="panel application">
-      <h2>Contoh Misi Aplikasi</h2>
-      <div class="bus-scene" aria-hidden="true"><span>🌳</span><span>🚏</span><span>🚌</span><span>🚌</span></div>
-      <p>Bas A tiba setiap <b>12 minit</b>, manakala Bas B tiba setiap <b>18 minit</b>. Jika kedua-dua bas tiba bersama pada pukul 8.00 pagi, bilakah kedua-duanya tiba bersama semula?</p>
-      <div class="answer-callout">Jawapan: <b>36 minit</b><br><small>(pukul 8.36 pagi)</small></div>
-    </section>
-  </section>
-
-  <section class="panel flow-panel">
-    <h2>Aliran Aktiviti Pembelajaran</h2>
-    <div class="flow">
-      <div class="flow-step"><span>◕</span><div><b>1. Terokai Peta</b><small>Kumpul nombor melalui permainan Pac-Man.</small></div></div><i>➜</i>
-      <div class="flow-step purple"><span>⑂</span><div><b>2. Selesaikan Pokok Faktor</b><small>Kenal pasti pemfaktoran perdana dan tentukan LCM.</small></div></div><i>➜</i>
-      <div class="flow-step green"><span>▣</span><div><b>3. Aplikasi dalam Misi</b><small>Gunakan LCM untuk menyelesaikan masalah harian.</small></div></div><i>➜</i>
-      <div class="flow-step orange"><span>🏆</span><div><b>4. Buka Pintu Seterusnya</b><small>Teruskan misi hingga ke peringkat akhir.</small></div></div>
     </div>
-  </section>
-</main>
-<footer>LCM QUEST <span>•</span> Belajar Matematik sambil bermain</footer>
-<script src="script.js"></script>
+    <div class="status-bar">
+      <div class="status-item">
+        <span>TAHAP:</span>
+        <span class="level-badge" id="levelBadge">1 / 5</span>
+      </div>
+      <div class="status-item">
+        <span>SKOR:</span>
+        <span id="scoreVal" style="color: var(--pacman-yellow)">0</span>
+      </div>
+      <div class="status-item">
+        <span>NYAWA:</span>
+        <span id="livesContainer">❤️❤️❤️</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN CONTAINER -->
+  <main class="game-container">
+    <!-- PACMAN CANVAS -->
+    <section class="maze-card">
+      <div class="canvas-wrapper">
+        <canvas id="gameCanvas" width="440" height="480"></canvas>
+        <div class="freeze-banner" id="freezeBanner">❄️ MAZE DIBEKUKAN (FASA GSTK)</div>
+      </div>
+
+      <!-- VIRTUAL D-PAD -->
+      <div class="dpad-container">
+        <button class="dbtn dbtn-up" id="btnUp">▲</button>
+        <button class="dbtn dbtn-left" id="btnLeft">◀</button>
+        <button class="dbtn dbtn-down" id="btnDown">▼</button>
+        <button class="dbtn dbtn-right" id="btnRight">▶</button>
+      </div>
+    </section>
+
+    <!-- RIGHT PANEL -->
+    <section class="learning-panel">
+      <!-- STORY CARD -->
+      <div class="panel-card">
+        <div class="panel-header">
+          <div class="panel-title">
+            <span>🎯</span> <span id="missionLevelTitle">MISI 1: JADUAL BAS BANDAR</span>
+          </div>
+          <button class="briefing-btn" id="btnShowBriefing">📖 Baca Situasi Semula</button>
+        </div>
+        <div class="story-desc" id="missionStoryText">
+          Bas A tiba setiap 6 minit dan Bas B tiba setiap 8 minit. Cari faktor perdana untuk mengisi daun pokok faktor 6 dan 8 supaya anda boleh menentukan bila kedua-dua bas akan bertembung semula!
+        </div>
+        <div class="task-badge" id="taskTargetBadge">
+          Misi Maze: Pac-Man perlu mencari faktor perdana untuk pokok!
+        </div>
+      </div>
+
+      <!-- FACTOR TREES PANEL -->
+      <div class="panel-card">
+        <div class="panel-header">
+          <div class="panel-title">
+            <span>🌳</span> POKOK FAKTOR (FACTOR TREES)
+          </div>
+          <span style="font-size: 11px; color: #94a3b8;">*Nombor betul akan terus mengisi slot daun '?'</span>
+        </div>
+        <div class="trees-grid" id="treesContainer"></div>
+      </div>
+
+      <!-- GSTK SOLVER CARD -->
+      <div class="panel-card lcm-quiz-container" id="quizWorkspace" style="opacity: 0.5; pointer-events: none;">
+        <div class="panel-header">
+          <div class="panel-title" style="color: #c084fc;">
+            <span>📐</span> RUANG KERJA & RUMUSAN GSTK
+          </div>
+          <span id="quizStatusBadge" style="font-size: 11px; color: #94a3b8;">(Kumpul semua faktor dalam maze dahulu)</span>
+        </div>
+
+        <div class="quiz-step">
+          <span class="step-label">Langkah 1: Berdasarkan pokok faktor di atas, pilih pendaraban kuasa tertinggi yang betul untuk mencari GSTK:</span>
+          <div class="radio-choices" id="choicesContainer"></div>
+        </div>
+
+        <div class="quiz-step">
+          <span class="step-label">Langkah 2: Hitung nilai GSTK dan buka pintu seterusnya:</span>
+          <div class="input-row">
+            <input type="number" id="lcmInput" class="lcm-input" placeholder="Jawapan" autocomplete="off">
+            <button class="submit-btn" id="btnSubmitLCM">BUKA PINTU ➔</button>
+          </div>
+          <div class="quiz-feedback" id="quizFeedback"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- TOAST PENALTY -->
+  <div class="toast-alert" id="toastAlert">⚠️ -1 NYAWA! NOMBOR ITU BUKAN FAKTOR PERDANA!</div>
+
+  <!-- MODAL: WELCOME -->
+  <div class="modal-overlay" id="welcomeModal">
+    <div class="modal-box">
+      <h2 class="modal-title">SELAMAT DATANG KE<br><span style="color: #00d2ff;">LCM QUEST!</span></h2>
+      <p style="font-size: 14px; color: #cbd5e1; line-height: 1.6; margin: 14px 0;">
+        Kembara Pac-Man Matematik KSSM Tingkatan 1 (LS 2.2.2 & LS 2.2.3).<br><br>
+        1. Baca situasi masalah harian.<br>
+        2. Makan <strong>faktor perdana (akar pokok)</strong> untuk penuhkan cabang '?' di sebelah kanan.<br>
+        3. Awas! Makan nombor bukan faktor perdana akan tolak <strong>1 Nyawa</strong>.<br>
+        4. Selesaikan rumus GSTK tanpa gangguan hantu apabila maze membeku!
+      </p>
+      <button class="modal-btn" id="btnStartGame">▶ TEKAN UNTUK MULA BERMAIN</button>
+    </div>
+  </div>
+
+  <!-- MODAL: BRIEFING -->
+  <div class="modal-overlay" id="modalBriefing" style="display: none;">
+    <div class="modal-box">
+      <div style="font-family: var(--font-retro); font-size: 11px; color: var(--border-blue); margin-bottom: 6px;" id="briefingSubtitle">TAHAP 1</div>
+      <h2 class="modal-title" id="briefingTitle">TAKLIMAT MISI: JADUAL BAS</h2>
+      <div style="background: rgba(0,0,0,0.5); padding: 14px; border-radius: 10px; text-align: left; margin: 12px 0; font-size: 14px; line-height: 1.6; border-left: 4px solid var(--border-blue);" id="briefingStory">
+        Bas A tiba setiap 6 minit. Bas B tiba setiap 8 minit.
+      </div>
+      <p style="font-size: 13px; color: #94a3b8;">
+        Gunakan masa bertenang ini untuk memikirkan faktor perdana bagi setiap nombor. Permainan akan bermula secara automatik!
+      </p>
+      <div class="timer-ring" id="briefingTimer">10s</div>
+      <button class="modal-btn" id="btnSkipBriefing">SAYA DAH FAHAM, MULA SEKARANG!</button>
+    </div>
+  </div>
+
+  <!-- MODAL: STAGE WIN -->
+  <div class="modal-overlay" id="modalWin" style="display: none;">
+    <div class="modal-box" style="border-color: var(--emerald-green);">
+      <h2 class="modal-title" style="color: var(--emerald-green);">TAHAP SELESAI! 🌟</h2>
+      <p style="font-size: 15px; color: #e2e8f0; margin: 14px 0; line-height: 1.6;" id="winExplanation">
+        Syabas! Anda berjaya mencari nilai GSTK dan menyelesaikan situasi harian ini.
+      </p>
+      <button class="modal-btn" id="btnNextLevel" style="background: var(--emerald-green); color: #000;">TERUSKAN KE TAHAP SETERUSNYA ➔</button>
+    </div>
+  </div>
+
+  <!-- MODAL: GAME OVER -->
+  <div class="modal-overlay" id="modalGameOver" style="display: none;">
+    <div class="modal-box" style="border-color: var(--danger-red);">
+      <h2 class="modal-title" style="color: var(--danger-red);">GAME OVER! 💀</h2>
+      <p style="font-size: 14px; color: #cbd5e1; margin: 14px 0;">
+        Nyawa anda telah habis! Berhati-hati semasa memilih nombor faktor dan mengelak daripada hantu.
+      </p>
+      <button class="modal-btn" id="btnRetryLevel" style="background: var(--danger-red); color: #fff;">CUBA LAGI TAHAP INI 🔄</button>
+    </div>
+  </div>
+
+  <script>
+    /* =========================================================================
+       AUDIO SYSTEM (Pure Web Audio API)
+       ========================================================================= */
+    class RetroAudio {
+      constructor() {
+        this.ctx = null;
+      }
+      init() {
+        try {
+          if (!this.ctx) {
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            this.ctx = new AudioContext();
+          }
+          if (this.ctx && this.ctx.state === 'suspended') {
+            this.ctx.resume();
+          }
+        } catch (e) {
+          console.warn("Audio Context init fallback:", e);
+        }
+      }
+      playDot() {
+        if (!this.ctx) return;
+        try {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(320, this.ctx.currentTime);
+          gain.gain.setValueAtTime(0.04, this.ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.06);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start();
+          osc.stop(this.ctx.currentTime + 0.06);
+        } catch (e) {}
+      }
+      playCorrectFactor() {
+        if (!this.ctx) return;
+        try {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(440, this.ctx.currentTime);
+          osc.frequency.exponentialRampToValueAtTime(880, this.ctx.currentTime + 0.25);
+          gain.gain.setValueAtTime(0.15, this.ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.3);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start();
+          osc.stop(this.ctx.currentTime + 0.3);
+        } catch (e) {}
+      }
+      playPenalty() {
+        if (!this.ctx) return;
+        try {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(160, this.ctx.currentTime);
+          osc.frequency.exponentialRampToValueAtTime(70, this.ctx.currentTime + 0.35);
+          gain.gain.setValueAtTime(0.2, this.ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.35);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start();
+          osc.stop(this.ctx.currentTime + 0.35);
+        } catch (e) {}
+      }
+      playWin() {
+        if (!this.ctx) return;
+        try {
+          const notes = [523.25, 659.25, 783.99, 1046.50];
+          notes.forEach((freq, idx) => {
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+            osc.type = 'square';
+            osc.frequency.setValueAtTime(freq, this.ctx.currentTime + idx * 0.12);
+            gain.gain.setValueAtTime(0.12, this.ctx.currentTime + idx * 0.12);
+            gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + idx * 0.12 + 0.2);
+            osc.connect(gain);
+            gain.connect(this.ctx.destination);
+            osc.start(this.ctx.currentTime + idx * 0.12);
+            osc.stop(this.ctx.currentTime + idx * 0.12 + 0.25);
+          });
+        } catch (e) {}
+      }
+    }
+    const audio = new RetroAudio();
+
+    /* =========================================================================
+       5 LEVEL CURRICULUM DATA
+       ========================================================================= */
+    const LEVELS_DATA = [
+      {
+        level: 1,
+        title: "MISI 1: JADUAL BAS BANDAR",
+        story: "Bas A bertolak dari stesen setiap 6 minit, manakala Bas B bertolak setiap 8 minit. Kedua-dua bas bertolak bersama pada pukul 8:00 pagi. Cari faktor perdana untuk pokok 6 dan 8 bagi mengetahui selepas berapa minit kedua-dua bas akan bertolak serentak sekali lagi!",
+        unit: "minit",
+        trees: [
+          { number: 6, primesNeeded: [2, 3], filled: [false, false] },
+          { number: 8, primesNeeded: [2, 2, 2], filled: [false, false, false] }
+        ],
+        distractors: [5, 7, 9],
+        options: [
+          { text: "2³ × 3 = 8 × 3", correct: true },
+          { text: "2 × 3 = 6", correct: false },
+          { text: "2⁴ × 3 = 16 × 3", correct: false }
+        ],
+        correctLCM: 24,
+        explanation: "Pendaraban kuasa tertinggi faktor perdana: 2³ × 3 = 8 × 3 = 24. Kedua-dua bas akan bertolak serentak lagi selepas 24 minit (pada pukul 8:24 pagi)!"
+      },
+      {
+        level: 2,
+        title: "MISI 2: LOCENG MAKMAL & KELAS",
+        story: "Loceng Makmal Sains berbunyi setiap 12 minit, manakala Loceng Bilik Seni berbunyi setiap 15 minit. Cari nombor akar pokok 12 dan 15 untuk mengira bila kedua-dua loceng akan berdering bersama-sama!",
+        unit: "minit",
+        trees: [
+          { number: 12, primesNeeded: [2, 2, 3], filled: [false, false, false] },
+          { number: 15, primesNeeded: [3, 5], filled: [false, false] }
+        ],
+        distractors: [7, 11],
+        options: [
+          { text: "2² × 3 × 5 = 4 × 3 × 5", correct: true },
+          { text: "2 × 3² × 5 = 2 × 9 × 5", correct: false },
+          { text: "2 × 3 × 5 = 30", correct: false }
+        ],
+        correctLCM: 60,
+        explanation: "Pendaraban faktor perdana kuasa tertinggi: 2² × 3 × 5 = 60. Kedua-dua loceng berbunyi serentak setiap 60 minit (tepat 1 jam)!"
+      },
+      {
+        level: 3,
+        title: "MISI 3: KELIPAN RUMAH API MARIN",
+        story: "Lampu Rumah Api Utara berkelip setiap 12 saat, manakala Lampu Rumah Api Selatan berkelip setiap 18 saat. Cari nombor daun pokok faktor 12 dan 18 untuk menghitung waktu kelipan serentak kedua-dua rumah api!",
+        unit: "saat",
+        trees: [
+          { number: 12, primesNeeded: [2, 2, 3], filled: [false, false, false] },
+          { number: 18, primesNeeded: [2, 3, 3], filled: [false, false, false] }
+        ],
+        distractors: [5, 7],
+        options: [
+          { text: "2² × 3² = 4 × 9", correct: true },
+          { text: "2 × 3 = 6", correct: false },
+          { text: "2³ × 3² = 8 × 9", correct: false }
+        ],
+        correctLCM: 36,
+        explanation: "Pendaraban kuasa tertinggi: 2² × 3² = 4 × 9 = 36 saat. Cahaya kedua-dua rumah api menyala serentak setiap 36 saat!"
+      },
+      {
+        level: 4,
+        title: "MISI 4: PAKEJ HOTDOG & ROTI",
+        story: "Roti hotdog dijual dalam bungkusan 8 keping, manakala sosej dijual dalam bungkusan 12 batang. Anda mahu membeli bilangan roti dan sosej yang sama tanpa sebarang baki. Cari daun faktor untuk menentukan bilangan minimum hotdog!",
+        unit: "keping/batang",
+        trees: [
+          { number: 8, primesNeeded: [2, 2, 2], filled: [false, false, false] },
+          { number: 12, primesNeeded: [2, 2, 3], filled: [false, false, false] }
+        ],
+        distractors: [5, 7, 9],
+        options: [
+          { text: "2³ × 3 = 8 × 3", correct: true },
+          { text: "2² × 3 = 4 × 3", correct: false },
+          { text: "2³ × 3² = 8 × 9", correct: false }
+        ],
+        correctLCM: 24,
+        explanation: "GSTK bagi 8 dan 12 ialah 2³ × 3 = 24. Anda perlu menyediakan 24 set hotdog (iaitu 3 paket roti dan 2 paket sosej)!"
+      },
+      {
+        level: 5,
+        title: "MISI 5 (CABARAN 3 NOMBOR): ORBIT 3 SATELIT",
+        story: "Tiga buah satelit komunikasi mengorbit stesen bumi. Satelit Alfa melengkapkan orbit dalam 4 jam, Satelit Beta dalam 6 jam, dan Satelit Gamma dalam 10 jam. Lengkapkan 3 pokok faktor ini untuk menghitung tempoh orbit selari!",
+        unit: "jam",
+        trees: [
+          { number: 4, primesNeeded: [2, 2], filled: [false, false] },
+          { number: 6, primesNeeded: [2, 3], filled: [false, false] },
+          { number: 10, primesNeeded: [2, 5], filled: [false, false] }
+        ],
+        distractors: [7, 9, 11],
+        options: [
+          { text: "2² × 3 × 5 = 4 × 3 × 5", correct: true },
+          { text: "2³ × 3 × 5 = 8 × 15", correct: false },
+          { text: "2 × 3 × 5 = 30", correct: false }
+        ],
+        correctLCM: 60,
+        explanation: "Faktor perdana tertinggi bagi 4, 6, dan 10 ialah 2² × 3 × 5 = 60 jam. Ketiga-tiga satelit akan kembali berbaris selari selepas 60 jam!"
+      }
+    ];
+
+    /* =========================================================================
+       GRID MAP (22 COLS x 24 ROWS)
+       1 = Dinding Biru, 0 = Titik Makanan (Pellet), 2 = Ruang Kosong / Terowong
+       ========================================================================= */
+    const BASE_MAZE = [
+      [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+      [1,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,1],
+      [1,0,1,1,1,0,1,1,1,0,1,1,0,1,1,1,0,1,1,1,0,1],
+      [1,0,1,1,1,0,1,1,1,0,1,1,0,1,1,1,0,1,1,1,0,1],
+      [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+      [1,0,1,1,1,0,1,0,1,1,1,1,1,1,0,1,0,1,1,1,0,1],
+      [1,0,0,0,0,0,1,0,0,0,1,1,0,0,0,1,0,0,0,0,0,1],
+      [1,1,1,1,1,0,1,1,1,2,1,1,2,1,1,1,0,1,1,1,1,1],
+      [2,2,2,2,1,0,1,2,2,2,2,2,2,2,2,1,0,1,2,2,2,2],
+      [1,1,1,1,1,0,1,2,1,1,2,2,1,1,2,1,0,1,1,1,1,1],
+      [2,2,2,2,2,0,2,2,1,2,2,2,2,1,2,2,0,2,2,2,2,2],
+      [1,1,1,1,1,0,1,2,1,1,1,1,1,1,2,1,0,1,1,1,1,1],
+      [2,2,2,2,1,0,1,2,2,2,2,2,2,2,2,1,0,1,2,2,2,2],
+      [1,1,1,1,1,0,1,2,1,1,1,1,1,1,2,1,0,1,1,1,1,1],
+      [1,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,1],
+      [1,0,1,1,1,0,1,1,1,0,1,1,0,1,1,1,0,1,1,1,0,1],
+      [1,0,0,0,1,0,0,0,0,0,2,2,0,0,0,0,0,1,0,0,0,1],
+      [1,1,1,0,1,0,1,0,1,1,1,1,1,1,0,1,0,1,0,1,1,1],
+      [1,0,0,0,0,0,1,0,0,0,1,1,0,0,0,1,0,0,0,0,0,1],
+      [1,0,1,1,1,1,1,1,1,0,1,1,0,1,1,1,1,1,1,1,0,1],
+      [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+      [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+      [2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2],
+      [2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2]
+    ];
+
+    let maze = [];
+    let numberItems = [];
+
+    let currentLevelIndex = 0;
+    let score = 0;
+    let lives = 3;
+    let isGameRunning = false;
+    let isQuizSolvingActive = false;
+    let briefingInterval = null;
+    let briefingTimeLeft = 10;
+
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    const TILE_SIZE = 20;
+    const COLS = 22;
+    const ROWS = 24;
+
+    let pacman = {
+      x: 10 * TILE_SIZE + 10,
+      y: 16 * TILE_SIZE + 10,
+      dirX: 0,
+      dirY: 0,
+      nextDirX: 0,
+      nextDirY: 0,
+      speed: 2
+    };
+
+    let ghosts = [
+      { x: 9 * TILE_SIZE + 10, y: 10 * TILE_SIZE + 10, dirX: 1, dirY: 0, color: '#ef4444', speed: 1.5 },
+      { x: 10 * TILE_SIZE + 10, y: 10 * TILE_SIZE + 10, dirX: -1, dirY: 0, color: '#f472b6', speed: 1.5 },
+      { x: 11 * TILE_SIZE + 10, y: 10 * TILE_SIZE + 10, dirX: 0, dirY: -1, color: '#38bdf8', speed: 1.5 },
+      { x: 12 * TILE_SIZE + 10, y: 10 * TILE_SIZE + 10, dirX: 0, dirY: 1, color: '#fb923c', speed: 1.5 }
+    ];
+
+    /* DOM REFS */
+    const scoreVal = document.getElementById('scoreVal');
+    const livesContainer = document.getElementById('livesContainer');
+    const levelBadge = document.getElementById('levelBadge');
+    const missionLevelTitle = document.getElementById('missionLevelTitle');
+    const missionStoryText = document.getElementById('missionStoryText');
+    const treesContainer = document.getElementById('treesContainer');
+    const freezeBanner = document.getElementById('freezeBanner');
+    const quizWorkspace = document.getElementById('quizWorkspace');
+    const quizStatusBadge = document.getElementById('quizStatusBadge');
+    const choicesContainer = document.getElementById('choicesContainer');
+    const lcmInput = document.getElementById('lcmInput');
+    const btnSubmitLCM = document.getElementById('btnSubmitLCM');
+    const quizFeedback = document.getElementById('quizFeedback');
+    const toastAlert = document.getElementById('toastAlert');
+
+    const welcomeModal = document.getElementById('welcomeModal');
+    const modalBriefing = document.getElementById('modalBriefing');
+    const briefingTimer = document.getElementById('briefingTimer');
+    const briefingTitle = document.getElementById('briefingTitle');
+    const briefingStory = document.getElementById('briefingStory');
+    const briefingSubtitle = document.getElementById('briefingSubtitle');
+    const modalWin = document.getElementById('modalWin');
+    const winExplanation = document.getElementById('winExplanation');
+    const modalGameOver = document.getElementById('modalGameOver');
+
+    /* =========================================================================
+       INITIALIZE LEVEL
+       ========================================================================= */
+    function initLevel(lvlIdx) {
+      currentLevelIndex = lvlIdx;
+      const data = LEVELS_DATA[currentLevelIndex];
+
+      data.trees.forEach(t => {
+        t.filled = new Array(t.primesNeeded.length).fill(false);
+      });
+
+      levelBadge.textContent = `${data.level} / 5`;
+      missionLevelTitle.textContent = data.title;
+      missionStoryText.textContent = data.story;
+      updateLivesDisplay();
+
+      isQuizSolvingActive = false;
+      freezeBanner.style.display = 'none';
+      quizWorkspace.style.opacity = '0.4';
+      quizWorkspace.style.pointerEvents = 'none';
+      quizStatusBadge.textContent = "(Kumpul semua faktor dalam maze dahulu)";
+      lcmInput.value = '';
+      quizFeedback.style.display = 'none';
+
+      buildQuizChoices(data);
+      renderFactorTrees();
+
+      // Salin susunan maze asal dengan tepat
+      maze = BASE_MAZE.map(row => [...row]);
+
+      // Tetapkan posisi permulaan Pac-Man
+      pacman.x = 10 * TILE_SIZE + 10;
+      pacman.y = 16 * TILE_SIZE + 10;
+      pacman.dirX = 0;
+      pacman.dirY = 0;
+      pacman.nextDirX = 0;
+      pacman.nextDirY = 0;
+
+      // Tetapkan kedudukan rumah hantu
+      ghosts[0].x = 9 * TILE_SIZE + 10;  ghosts[0].y = 10 * TILE_SIZE + 10;
+      ghosts[1].x = 10 * TILE_SIZE + 10; ghosts[1].y = 10 * TILE_SIZE + 10;
+      ghosts[2].x = 11 * TILE_SIZE + 10; ghosts[2].y = 10 * TILE_SIZE + 10;
+      ghosts[3].x = 12 * TILE_SIZE + 10; ghosts[3].y = 10 * TILE_SIZE + 10;
+
+      spawnMazeNumbers(data);
+      startBriefingPhase(data);
+    }
+
+    function spawnMazeNumbers(data) {
+      numberItems = [];
+      // Tempatkan nombor di laluan maze yang strategik dan boleh dilalui
+      const validSpots = [
+        { c: 1, r: 1 }, { c: 20, r: 1 },
+        { c: 1, r: 4 }, { c: 20, r: 4 },
+        { c: 6, r: 6 }, { c: 15, r: 6 },
+        { c: 1, r: 14 }, { c: 20, r: 14 },
+        { c: 4, r: 16 }, { c: 17, r: 16 },
+        { c: 1, r: 20 }, { c: 20, r: 20 },
+        { c: 10, r: 4 }, { c: 10, r: 18 }
+      ];
+
+      const neededPrimes = [];
+      data.trees.forEach(t => neededPrimes.push(...t.primesNeeded));
+
+      const allNumbersToPlace = [...neededPrimes, ...data.distractors];
+      allNumbersToPlace.sort(() => Math.random() - 0.5);
+
+      allNumbersToPlace.forEach((numVal, idx) => {
+        if (idx < validSpots.length) {
+          numberItems.push({
+            value: numVal,
+            x: validSpots[idx].c * TILE_SIZE + 10,
+            y: validSpots[idx].r * TILE_SIZE + 10,
+            collected: false
+          });
+        }
+      });
+    }
+
+    /* BRIEFING */
+    function startBriefingPhase(data) {
+      isGameRunning = false;
+      briefingSubtitle.textContent = `TAHAP ${data.level} DARI 5`;
+      briefingTitle.textContent = data.title;
+      briefingStory.innerHTML = `<strong>SITUASI:</strong><br>${data.story}`;
+      briefingTimeLeft = 10;
+      briefingTimer.textContent = `${briefingTimeLeft}s`;
+      modalBriefing.style.display = 'flex';
+
+      if (briefingInterval) clearInterval(briefingInterval);
+
+      briefingInterval = setInterval(() => {
+        briefingTimeLeft--;
+        if (briefingTimeLeft > 0) {
+          briefingTimer.textContent = `${briefingTimeLeft}s`;
+        } else {
+          clearInterval(briefingInterval);
+          closeBriefingAndPlay();
+        }
+      }, 1000);
+    }
+
+    function closeBriefingAndPlay() {
+      if (briefingInterval) clearInterval(briefingInterval);
+      modalBriefing.style.display = 'none';
+      isGameRunning = true;
+    }
+
+    /* POKOK FAKTOR SVG */
+    function renderFactorTrees() {
+      treesContainer.innerHTML = '';
+      const data = LEVELS_DATA[currentLevelIndex];
+
+      data.trees.forEach(tree => {
+        const isComplete = tree.filled.every(f => f === true);
+        const box = document.createElement('div');
+        box.className = `tree-box ${isComplete ? 'completed' : ''}`;
+
+        const title = document.createElement('div');
+        title.className = 'tree-title';
+        title.textContent = `POKOK FAKTOR: ${tree.number}`;
+        box.appendChild(title);
+
+        const svgWrap = document.createElement('div');
+        svgWrap.className = 'tree-svg-container';
+        svgWrap.innerHTML = generateTreeSVG(tree);
+        box.appendChild(svgWrap);
+
+        const exp = document.createElement('div');
+        exp.className = 'tree-index-equation';
+        const parts = tree.primesNeeded.map((p, i) => tree.filled[i] ? p : '?');
+        exp.textContent = `${tree.number} = ${parts.join(' × ')}`;
+        box.appendChild(exp);
+
+        treesContainer.appendChild(box);
+      });
+    }
+
+    function generateTreeSVG(tree) {
+      const w = 220, h = 150;
+      const rootX = w / 2, rootY = 30;
+      const count = tree.primesNeeded.length;
+      let svgContent = `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">`;
+
+      const leafY = 110;
+      const stepX = w / (count + 1);
+
+      for (let i = 0; i < count; i++) {
+        const leafX = stepX * (i + 1);
+        svgContent += `<line x1="${rootX}" y1="${rootY}" x2="${leafX}" y2="${leafY}" stroke="#64748b" stroke-width="3" stroke-dasharray="2,2"/>`;
+      }
+
+      svgContent += `
+        <circle cx="${rootX}" cy="${rootY}" r="20" fill="#a855f7" stroke="#ffffff" stroke-width="2"/>
+        <text x="${rootX}" y="${rootY + 6}" font-family="'Press Start 2P', monospace" font-size="12" fill="#fff" text-anchor="middle" font-weight="bold">${tree.number}</text>
+      `;
+
+      for (let i = 0; i < count; i++) {
+        const leafX = stepX * (i + 1);
+        const isFilled = tree.filled[i];
+        const displayVal = isFilled ? tree.primesNeeded[i] : '?';
+        const fillColor = isFilled ? '#10b981' : '#1e293b';
+        const strokeColor = isFilled ? '#6ee7b7' : '#94a3b8';
+        const textColor = isFilled ? '#000000' : '#f8fafc';
+
+        svgContent += `
+          <circle cx="${leafX}" cy="${leafY}" r="17" fill="${fillColor}" stroke="${strokeColor}" stroke-width="2">
+            ${isFilled ? '<animate attributeName="r" values="17;21;17" dur="0.3s"/>' : ''}
+          </circle>
+          <text x="${leafX}" y="${leafY + 5}" font-family="'Press Start 2P', monospace" font-size="11" fill="${textColor}" text-anchor="middle" font-weight="bold">${displayVal}</text>
+        `;
+      }
+
+      svgContent += `</svg>`;
+      return svgContent;
+    }
+
+    /* KUTIP NOMBOR & PENALTI */
+    function checkNumberCollection(px, py) {
+      const data = LEVELS_DATA[currentLevelIndex];
+
+      numberItems.forEach(item => {
+        if (!item.collected) {
+          const dist = Math.hypot(item.x - px, item.y - py);
+          if (dist < 15) {
+            item.collected = true;
+
+            let matched = false;
+            for (let t of data.trees) {
+              for (let i = 0; i < t.primesNeeded.length; i++) {
+                if (!t.filled[i] && t.primesNeeded[i] === item.value) {
+                  t.filled[i] = true;
+                  matched = true;
+                  break;
+                }
+              }
+              if (matched) break;
+            }
+
+            if (matched) {
+              audio.playCorrectFactor();
+              score += 100;
+              scoreVal.textContent = score;
+              renderFactorTrees();
+
+              const allTreesComplete = data.trees.every(t => t.filled.every(f => f === true));
+              if (allTreesComplete) {
+                activateFreezeAndQuiz();
+              }
+            } else {
+              audio.playPenalty();
+              lives--;
+              updateLivesDisplay();
+              showToastAlert();
+
+              if (lives <= 0) {
+                gameOver();
+              }
+            }
+          }
+        }
+      });
+    }
+
+    function showToastAlert() {
+      toastAlert.style.display = 'block';
+      setTimeout(() => {
+        toastAlert.style.display = 'none';
+      }, 1800);
+    }
+
+    function updateLivesDisplay() {
+      let hearts = '';
+      for (let i = 0; i < lives; i++) hearts += '❤️';
+      livesContainer.textContent = hearts || '💀 TIADA';
+    }
+
+    /* FREEZE & QUIZ GSTK */
+    function activateFreezeAndQuiz() {
+      isQuizSolvingActive = true;
+      freezeBanner.style.display = 'block';
+      quizWorkspace.style.opacity = '1';
+      quizWorkspace.style.pointerEvents = 'auto';
+      quizStatusBadge.textContent = "🔓 TERBUKA: Sila jawab soalan GSTK di bawah!";
+      quizStatusBadge.style.color = "#10b981";
+      lcmInput.focus();
+    }
+
+    function buildQuizChoices(data) {
+      choicesContainer.innerHTML = '';
+      data.options.forEach((opt, idx) => {
+        const label = document.createElement('label');
+        label.className = 'choice-option';
+        label.innerHTML = `
+          <input type="radio" name="primePowerOption" value="${idx}">
+          <span>${opt.text}</span>
+        `;
+        choicesContainer.appendChild(label);
+      });
+    }
+
+    btnSubmitLCM.addEventListener('click', handleQuizSubmission);
+    lcmInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') handleQuizSubmission();
+    });
+
+    function handleQuizSubmission() {
+      const data = LEVELS_DATA[currentLevelIndex];
+      const selectedRadio = document.querySelector('input[name="primePowerOption"]:checked');
+      const enteredValue = parseInt(lcmInput.value.trim());
+
+      quizFeedback.style.display = 'block';
+
+      if (!selectedRadio) {
+        quizFeedback.className = 'quiz-feedback feedback-error';
+        quizFeedback.textContent = "Sila pilih susunan pendaraban kuasa tertinggi di Langkah 1!";
+        return;
+      }
+
+      const selectedIdx = parseInt(selectedRadio.value);
+      const isPowerCorrect = data.options[selectedIdx].correct;
+
+      if (!isPowerCorrect) {
+        quizFeedback.className = 'quiz-feedback feedback-error';
+        quizFeedback.textContent = "Pilihan kuasa tertinggi di Langkah 1 kurang tepat. Rujuk indeks kuasa pokok di atas!";
+        return;
+      }
+
+      if (isNaN(enteredValue) || enteredValue !== data.correctLCM) {
+        quizFeedback.className = 'quiz-feedback feedback-error';
+        quizFeedback.textContent = "Pengiraan GSTK belum tepat. Hitung semula hasil darab susunan pilihan anda!";
+        return;
+      }
+
+      audio.playWin();
+      score += 300;
+      scoreVal.textContent = score;
+      quizFeedback.className = 'quiz-feedback feedback-success';
+      quizFeedback.textContent = "TAHNIAH! Jawapan GSTK anda tepat sekali! Pintu berjaya dibuka!";
+
+      setTimeout(() => {
+        winExplanation.innerHTML = `
+          <strong>Jawapan GSTK = ${data.correctLCM} ${data.unit}</strong><br><br>
+          ${data.explanation}
+        `;
+        modalWin.style.display = 'flex';
+      }, 1000);
+    }
+
+    /* PAC-MAN & GHOST ENGINE */
+    function isWall(col, row) {
+      if (row < 0 || row >= ROWS || col < 0 || col >= COLS) return true;
+      return maze[row][col] === 1;
+    }
+
+    function canMoveTo(x, y) {
+      const r = 8;
+      const leftCol = Math.floor((x - r) / TILE_SIZE);
+      const rightCol = Math.floor((x + r) / TILE_SIZE);
+      const topRow = Math.floor((y - r) / TILE_SIZE);
+      const btmRow = Math.floor((y + r) / TILE_SIZE);
+
+      return !isWall(leftCol, topRow) &&
+             !isWall(rightCol, topRow) &&
+             !isWall(leftCol, btmRow) &&
+             !isWall(rightCol, btmRow);
+    }
+
+    function updatePacman() {
+      if (isQuizSolvingActive || !isGameRunning) return;
+
+      if (pacman.nextDirX !== 0 || pacman.nextDirY !== 0) {
+        if (canMoveTo(pacman.x + pacman.nextDirX * pacman.speed, pacman.y + pacman.nextDirY * pacman.speed)) {
+          pacman.dirX = pacman.nextDirX;
+          pacman.dirY = pacman.nextDirY;
+          pacman.nextDirX = 0;
+          pacman.nextDirY = 0;
+        }
+      }
+
+      if (canMoveTo(pacman.x + pacman.dirX * pacman.speed, pacman.y + pacman.dirY * pacman.speed)) {
+        pacman.x += pacman.dirX * pacman.speed;
+        pacman.y += pacman.dirY * pacman.speed;
+      }
+
+      if (pacman.x < 0) pacman.x = canvas.width - 2;
+      else if (pacman.x >= canvas.width) pacman.x = 0;
+
+      const currentGridCol = Math.floor(pacman.x / TILE_SIZE);
+      const currentGridRow = Math.floor(pacman.y / TILE_SIZE);
+      if (maze[currentGridRow] && maze[currentGridRow][currentGridCol] === 0) {
+        maze[currentGridRow][currentGridCol] = 2; // Titik dimakan
+        score += 10;
+        scoreVal.textContent = score;
+        audio.playDot();
+      }
+
+      checkNumberCollection(pacman.x, pacman.y);
+    }
+
+    function updateGhosts() {
+      if (isQuizSolvingActive || !isGameRunning) return;
+
+      ghosts.forEach(g => {
+        if (canMoveTo(g.x + g.dirX * g.speed, g.y + g.dirY * g.speed)) {
+          g.x += g.dirX * g.speed;
+          g.y += g.dirY * g.speed;
+        } else {
+          const dirs = [
+            { x: 1, y: 0 }, { x: -1, y: 0 },
+            { x: 0, y: 1 }, { x: 0, y: -1 }
+          ];
+          const valid = dirs.filter(d => canMoveTo(g.x + d.x * g.speed, g.y + d.y * g.speed));
+          if (valid.length > 0) {
+            const chosen = valid[Math.floor(Math.random() * valid.length)];
+            g.dirX = chosen.x;
+            g.dirY = chosen.y;
+          }
+        }
+
+        const dist = Math.hypot(g.x - pacman.x, g.y - pacman.y);
+        if (dist < 14) {
+          audio.playPenalty();
+          lives--;
+          updateLivesDisplay();
+          pacman.x = 10 * TILE_SIZE + 10;
+          pacman.y = 16 * TILE_SIZE + 10;
+          pacman.dirX = 0;
+          pacman.dirY = 0;
+
+          if (lives <= 0) {
+            gameOver();
+          }
+        }
+      });
+    }
+
+    /* =========================================================================
+       CANVAS MAZE DRAWING
+       ========================================================================= */
+    function drawMaze() {
+      ctx.fillStyle = '#000000';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      if (!maze || maze.length === 0) return;
+
+      // 1. Lukis dinding dan titik makanan (pellets)
+      for (let r = 0; r < ROWS; r++) {
+        for (let c = 0; c < COLS; c++) {
+          const tile = maze[r][c];
+          if (tile === 1) {
+            // Blok dinding luar
+            ctx.fillStyle = '#1e3a8a';
+            ctx.fillRect(c * TILE_SIZE, r * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+            // Garisan neon biru berkilau
+            ctx.strokeStyle = '#00d2ff';
+            ctx.lineWidth = 1.5;
+            ctx.strokeRect(c * TILE_SIZE + 1, r * TILE_SIZE + 1, TILE_SIZE - 2, TILE_SIZE - 2);
+          } else if (tile === 0) {
+            // Titik makanan (pellet)
+            ctx.fillStyle = '#ffde59';
+            ctx.beginPath();
+            ctx.arc(c * TILE_SIZE + 10, r * TILE_SIZE + 10, 2.8, 0, Math.PI * 2);
+            ctx.fill();
+          }
+        }
+      }
+
+      // 2. Lukis orbs nombor faktor bercahaya
+      numberItems.forEach(item => {
+        if (!item.collected) {
+          ctx.save();
+          ctx.shadowColor = '#00d2ff';
+          ctx.shadowBlur = 12;
+          ctx.fillStyle = '#0f172a';
+          ctx.beginPath();
+          ctx.arc(item.x, item.y, 11, 0, Math.PI * 2);
+          ctx.fill();
+
+          ctx.strokeStyle = '#00d2ff';
+          ctx.lineWidth = 2.5;
+          ctx.stroke();
+
+          ctx.fillStyle = '#ffffff';
+          ctx.font = 'bold 12px monospace';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText(item.value, item.x, item.y);
+          ctx.restore();
+        }
+      });
+
+      // 3. Lukis Pac-Man
+      ctx.save();
+      ctx.translate(pacman.x, pacman.y);
+      let angle = 0;
+      if (pacman.dirX === 1) angle = 0;
+      else if (pacman.dirX === -1) angle = Math.PI;
+      else if (pacman.dirY === 1) angle = Math.PI / 2;
+      else if (pacman.dirY === -1) angle = -Math.PI / 2;
+
+      ctx.rotate(angle);
+      ctx.fillStyle = '#ffde59';
+      ctx.beginPath();
+      ctx.arc(0, 0, 9, 0.25 * Math.PI, 1.75 * Math.PI);
+      ctx.lineTo(0, 0);
+      ctx.fill();
+      ctx.restore();
+
+      // 4. Lukis Hantu
+      ghosts.forEach(g => {
+        ctx.save();
+        ctx.fillStyle = isQuizSolvingActive ? '#38bdf8' : g.color;
+
+        ctx.beginPath();
+        ctx.arc(g.x, g.y - 2, 8, Math.PI, 0, false);
+        ctx.lineTo(g.x + 8, g.y + 7);
+        ctx.lineTo(g.x + 4, g.y + 4);
+        ctx.lineTo(g.x, g.y + 7);
+        ctx.lineTo(g.x - 4, g.y + 4);
+        ctx.lineTo(g.x - 8, g.y + 7);
+        ctx.closePath();
+        ctx.fill();
+
+        // Mata hantu
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath();
+        ctx.arc(g.x - 3, g.y - 2, 2.5, 0, Math.PI * 2);
+        ctx.arc(g.x + 3, g.y - 2, 2.5, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = '#000000';
+        ctx.beginPath();
+        ctx.arc(g.x - 3 + g.dirX, g.y - 2 + g.dirY, 1.2, 0, Math.PI * 2);
+        ctx.arc(g.x + 3 + g.dirX, g.y - 2 + g.dirY, 1.2, 0, Math.PI * 2);
+        ctx.fill();
+
+        if (isQuizSolvingActive) {
+          ctx.fillStyle = '#ffffff';
+          ctx.font = '10px monospace';
+          ctx.fillText('❄', g.x - 4, g.y - 12);
+        }
+        ctx.restore();
+      });
+    }
+
+    function gameLoop() {
+      updatePacman();
+      updateGhosts();
+      drawMaze();
+      requestAnimationFrame(gameLoop);
+    }
+
+    function gameOver() {
+      isGameRunning = false;
+      modalGameOver.style.display = 'flex';
+    }
+
+    /* KAWALAN KEYBOARD & BUTANG */
+    window.addEventListener('keydown', (e) => {
+      if (document.activeElement === lcmInput) return;
+
+      if (e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W') {
+        pacman.nextDirX = 0; pacman.nextDirY = -1;
+      } else if (e.key === 'ArrowDown' || e.key === 's' || e.key === 'S') {
+        pacman.nextDirX = 0; pacman.nextDirY = 1;
+      } else if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') {
+        pacman.nextDirX = -1; pacman.nextDirY = 0;
+      } else if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') {
+        pacman.nextDirX = 1; pacman.nextDirY = 0;
+      }
+    });
+
+    document.getElementById('btnUp').addEventListener('touchstart', (e) => { e.preventDefault(); pacman.nextDirX = 0; pacman.nextDirY = -1; });
+    document.getElementById('btnDown').addEventListener('touchstart', (e) => { e.preventDefault(); pacman.nextDirX = 0; pacman.nextDirY = 1; });
+    document.getElementById('btnLeft').addEventListener('touchstart', (e) => { e.preventDefault(); pacman.nextDirX = -1; pacman.nextDirY = 0; });
+    document.getElementById('btnRight').addEventListener('touchstart', (e) => { e.preventDefault(); pacman.nextDirX = 1; pacman.nextDirY = 0; });
+
+    document.getElementById('btnStartGame').addEventListener('click', () => {
+      audio.init();
+      welcomeModal.style.display = 'none';
+      initLevel(0);
+    });
+
+    document.getElementById('btnSkipBriefing').addEventListener('click', closeBriefingAndPlay);
+
+    document.getElementById('btnShowBriefing').addEventListener('click', () => {
+      startBriefingPhase(LEVELS_DATA[currentLevelIndex]);
+    });
+
+    document.getElementById('btnNextLevel').addEventListener('click', () => {
+      modalWin.style.display = 'none';
+      if (currentLevelIndex < LEVELS_DATA.length - 1) {
+        initLevel(currentLevelIndex + 1);
+      } else {
+        alert("🎉 TAHNIAH! Anda telah menamatkan kesemua 5 Misi GSTK!");
+        initLevel(0);
+      }
+    });
+
+    document.getElementById('btnRetryLevel').addEventListener('click', () => {
+      modalGameOver.style.display = 'none';
+      lives = 3;
+      initLevel(currentLevelIndex);
+    });
+
+    // Inisialisasi awal maze pada canvas sebaik sahaja laman dimuatkan
+    maze = BASE_MAZE.map(row => [...row]);
+    renderFactorTrees();
+    requestAnimationFrame(gameLoop);
+  </script>
 </body>
 </html>
